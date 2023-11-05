@@ -1,14 +1,15 @@
 <template>
-    <ion-page>
-      <ion-header>
-        <ion-toolbar>
-          <ion-title>Login</ion-title>
-        </ion-toolbar>
-      </ion-header>
-      <ion-content :fullscreen="true" class="center">
-        <ion-list>
+  <ion-page >
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>Login</ion-title>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content :fullscreen="true" class="ion-padding">
+      <div class="container">
+        <ion-list class="list-container">
           <ion-item>
-            <ion-label position="floating">Telemovel</ion-label>
+            <ion-label position="floating">Phone</ion-label>
             <ion-input v-model="telemovel" type="number"></ion-input>
           </ion-item>
           <ion-item>
@@ -24,12 +25,14 @@
           <p v-for="error in errors" class="error">{{ error }}</p>
         </div>
         <ion-button expand="block" @click="login">Create</ion-button>
-      </ion-content>
-    </ion-page>
-  </template>
+      </div>
+    </ion-content>
+  </ion-page>
+</template>
+
   
   <script setup>
-  import { ref, inject } from 'vue';
+  import { ref, inject, onBeforeMount } from 'vue';
   import { useRouter } from 'vue-router';
   import { Storage } from '@ionic/storage';
   import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonInput, IonButton } from '@ionic/vue';
@@ -37,7 +40,16 @@
   const axios = inject('axios');
   const router = useRouter();
 
+  const store = new Storage();
+  store.create();
 
+  onBeforeMount(() => {
+    store.get('token').then((name) => {
+      if (name){
+        router.push('/dashboard');
+      }
+    });
+  });
 
   const telemovel = ref('');
   const password = ref('');
@@ -75,11 +87,12 @@
         }).then((response) => {
           console.log(response.data);
           if (response.data.access_token){
+            store.set('token', response.data.access_token);
             router.push('/dashboard');
           }
         }, (error) => {
           console.log(error);
-          if (error.response.status == 401){
+          if (error.response.status == 401 || error.response.status == 400){
             errors.value.push('Credenciais inválidas');
           }
         });
@@ -104,14 +117,21 @@
   </script>
   
   <style scoped>
-  .center {
-    width: 50%;
-    padding: 20px;
+  .container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
   }
   
-
-  .error{
-    color: red;
+  .list-container {
+    width: 100%;
+    max-width: 400px; /* Adjust max-width as needed */
   }
-
+  
+  .error {
+    color: red;
+    text-align: center;
+  }
   </style>
