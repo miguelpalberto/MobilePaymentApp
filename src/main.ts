@@ -23,10 +23,25 @@ import '@ionic/vue/css/display.css';
 /* Theme variables */
 import './theme/variables.css';
 
+import axios from 'axios';
+
 const app = createApp(App)
   .use(IonicVue)
   .use(router);
+
+const apiDomain = 'http://127.0.0.1:8000/api' //todo: add config file
+
+app.provide(
+    'axios',
+    axios.create({
+      baseURL: apiDomain,
+      headers: {
+        'Content-type': 'application/json'
+      }
+    })
+  )
   
+
 router.isReady().then(() => {
   app.mount('#app');
 });
