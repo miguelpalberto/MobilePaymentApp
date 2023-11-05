@@ -5,8 +5,26 @@
   </template>
   
   <script setup lang="ts">
+  import { ref, inject, onBeforeMount } from 'vue';
   import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
-  </script>
+  import { Storage } from '@ionic/storage';
+  import { useRouter } from 'vue-router';
+
+  const store = new Storage();
+  store.create();
+
+  const router = useRouter();
+
+  onBeforeMount(() => {
+    store.get('token').then((name) => {
+      if (!name){
+        router.push('/login');
+      }
+    });
+  });
+ 
+ 
+ </script>
   
   <style scoped>
   #container {
