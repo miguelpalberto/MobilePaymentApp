@@ -20,6 +20,9 @@
             <ion-input v-model="pin" type="password"></ion-input>
           </ion-item>
         </ion-list>
+        <div v-show="errors.length > 0">
+          <p v-for="error in errors" class="error">{{ error }}</p>
+        </div>
         <ion-button expand="block" @click="login">Create</ion-button>
       </ion-content>
     </ion-page>
@@ -36,46 +39,66 @@
 
 
 
-    const telemovel = ref('');
-    const password = ref('');
-    const pin = ref('');
+  const telemovel = ref('');
+  const password = ref('');
+  const pin = ref('');
 
-  
-    const login = () => {
-        // return router.push('/dashboard');
-    // Aqui você irá adicionar a lógica para realizar o login
-    // Isso provavelmente envolverá fazer uma requisição HTTP a um endpoint
-        //valida se o campo telemovel está vazio e se tem 9 digitos e começa por 9
-        if (telemovel.value == '' || telemovel.value.length != 9 || telemovel.value.charAt(0) != 9) {
-            alert('O campo telemovel está vazio ou não tem 9 digitos ou não começa por 9');
-            return;
-        }
-        //valida se o campo password está vazio
-        if (password.value == '') {
-            alert('O campo password está vazio');
-            return;
-        }
+  const errors = ref([]);
 
-        //valida se o campo pin está vazio e se tem 4 digitos
-        if (pin.value == '' || pin.value.length != 4) {
-            alert('O campo pin está vazio ou não tem 4 digitos');
-            return;
-        }
+  const login = () => {
+      // return router.push('/dashboard');
+      //valida se o campo telemovel está vazio e se tem 9 digitos e começa por 9
+      errors.value = [];
+      let valid = true;
+      if (telemovel.value == '' || telemovel.value.length != 9 || telemovel.value.charAt(0) != 9) {
+          errors.value.push('O campo telemovel está vazio ou não tem 9 digitos ou não começa por 9');
+          valid = false;
+      }
+      //valida se o campo password está vazio
+      if (password.value == '') {
+        errors.value.push('O campo password está vazio');
+        valid = false;
+      }
 
-        //valid 
-        
-    };
+      //valida se o campo pin está vazio e se tem 4 digitos
+      if (pin.value == '' || pin.value.length != 3) {
+        errors.value.push('O campo pin está vazio ou não tem 4 digitos');
+        valid = false;
+      }
 
-    // const abc = async () => {
-    //     const store = new Storage();
-    //     await store.create();
-    //     const name = await store.get('name');
-    //     // await store.set('name', 'Max');
-    //     console.log(name)
-    // }
 
-    // abc()
- 
+      if (valid){
+        axios.post('/auth/login', {
+          username: telemovel.value,
+          password: password.value,
+          confirmation_code: pin.value
+        }).then((response) => {
+          console.log(response.data);
+          if (response.data.access_token){
+            router.push('/dashboard');
+          }
+        }, (error) => {
+          console.log(error);
+          if (error.response.status == 401){
+            errors.value.push('Credenciais inválidas');
+          }
+        });
+      }
+
+      //valid 
+      
+  };
+
+  // const abc = async () => {
+  //     const store = new Storage();
+  //     await store.create();
+  //     const name = await store.get('name');
+  //     // await store.set('name', 'Max');
+  //     console.log(name)
+  // }
+
+  // abc()
+
 
 
   </script>
@@ -86,5 +109,9 @@
     padding: 20px;
   }
   
+
+  .error{
+    color: red;
+  }
 
   </style>
