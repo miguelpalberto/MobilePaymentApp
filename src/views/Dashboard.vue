@@ -1,6 +1,13 @@
 <template>
     <ion-page>
       dashboard
+      <div>
+        <ion-list>
+          <ion-item v-for="vcard in vcards" :key="vcard.id">
+            <ion-label>{{ vcard.name }}</ion-label>
+          </ion-item>
+        </ion-list>
+      </div>
     </ion-page>
   </template>
   
@@ -10,19 +17,28 @@
   import { Storage } from '@ionic/storage';
   import { useRouter } from 'vue-router';
 
+  const vcards = ref([]);
+
   const store = new Storage();
   store.create();
+
+  const axios = inject('axios');
 
   const router = useRouter();
 
   onBeforeMount(() => {
-    store.get('token').then((name) => {
-      if (!name){
+    store.get('token').then((token) => {
+      if (!token){
         router.push('/login');
+      }else{
+        axios.defaults.headers.common.Authorization = 'Bearer ' + token
+
       }
     });
   });
- 
+
+
+
  
  </script>
   
