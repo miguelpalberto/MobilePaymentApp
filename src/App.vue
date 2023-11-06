@@ -66,6 +66,11 @@ import {
 const selectedIndex = ref(0);
 const appPages = [
   {
+    title: 'Login',
+    url: '/login',
+    iosIcon: warningOutline,
+  },
+  {
     title: 'Inbox',
     url: '/folder/Inbox',
     iosIcon: mailOutline,
