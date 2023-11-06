@@ -63,18 +63,18 @@
       errors.value = [];
       let valid = true;
       if (telemovel.value == '' || telemovel.value.length != 9 || telemovel.value.charAt(0) != 9) {
-          errors.value.push('O campo telemovel está vazio ou não tem 9 digitos ou não começa por 9');
+          errors.value.push('The phone field is empty or does not have 9 digits or does not start with 9');
           valid = false;
       }
       //valida se o campo password está vazio
       if (password.value == '') {
-        errors.value.push('O campo password está vazio');
+        errors.value.push('The password field is empty');
         valid = false;
       }
 
       //valida se o campo pin está vazio e se tem 4 digitos
       if (pin.value == '' || pin.value.length != 3) {
-        errors.value.push('O campo pin está vazio ou não tem 4 digitos');
+        errors.value.push('The pin field is empty or does not have 3 digits');
         valid = false;
       }
 
@@ -93,7 +93,7 @@
         }, (error) => {
           console.log(error);
           if (error.response.status == 401 || error.response.status == 400){
-            errors.value.push('Credenciais inválidas');
+            errors.value.push('Invalid credentials');
           }
         });
       }

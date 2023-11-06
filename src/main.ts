@@ -29,7 +29,7 @@ const app = createApp(App)
   .use(IonicVue)
   .use(router);
 
-const apiDomain = 'http://127.0.0.1:8000/api' //todo: add config file
+const apiDomain = 'http://localhost:8000/api' //todo: add config file
 
 app.provide(
     'axios',
