@@ -18,14 +18,11 @@
           </div>
       </div>
     </ion-content>
-
-
-    
     </ion-page>
   </template>
   
   <script setup>
-  import { ref, inject } from 'vue';
+  import { ref, inject, onMounted } from 'vue';
   import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonSpinner, onIonViewWillEnter  } from '@ionic/vue';
   import { Storage } from '@ionic/storage';
   import { useRouter } from 'vue-router';
@@ -41,7 +38,6 @@
   const router = useRouter();
 
   onIonViewWillEnter(async () => {
-    console.log('mounted')
     const store = new Storage();
     await store.create();
     const token = await store.get('token')
@@ -60,7 +56,6 @@
     }
     
   });
-
 
 
  

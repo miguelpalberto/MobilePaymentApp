@@ -35,14 +35,14 @@
   import { ref, inject, onBeforeMount } from 'vue';
   import { useRouter } from 'vue-router';
   import { Storage } from '@ionic/storage';
-  import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonInput, IonButton, onIonViewDidEnter } from '@ionic/vue';
+  import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonInput, IonButton, onIonViewDidEnter, onIonViewWillEnter } from '@ionic/vue';
   
   const axios = inject('axios');
   const router = useRouter();
 
   const store = new Storage();
 
-  onIonViewDidEnter(async () => {
+  onIonViewWillEnter(async () => {
     await store.create();
 
     const token = await store.get('token')
