@@ -14,7 +14,7 @@
             <ion-spinner></ion-spinner>
         </div>
         <div v-else>
-            <Balance></Balance>
+            <Balance :phone="phone"></Balance>
           </div>
       </div>
     </ion-content>
@@ -32,7 +32,7 @@
 
   import Balance from '../components/Balance.vue';
 
-  const vcards = ref([]);
+  const phone = ref('');
   const loading = ref(true);
 
   const store = new Storage();
@@ -43,19 +43,19 @@
   const router = useRouter();
 
   onBeforeMount(() => {
-    setTimeout(() => {
-      store.get('token').then((token) => {
-      if (!token){
-        router.push('/login');
-      }else{
-        axios.defaults.headers.common.Authorization = 'Bearer ' + token;
-        loading.value = false;
-      }
-    });
-    }, 1000);
-
-
-    
+    store.get('token').then((token) => {
+    if (!token){
+      router.push('/login');
+    }else{
+      axios.defaults.headers.common.Authorization = 'Bearer ' + token;
+      store.get('phone_number').then((phoneNumber) => {
+        if (phoneNumber){
+          phone.value = phoneNumber;
+          loading.value = false;
+        }
+      });
+    }
+  });
   });
 
 
