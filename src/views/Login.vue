@@ -88,6 +88,7 @@
           console.log(response.data);
           if (response.data.access_token){
             store.set('token', response.data.access_token);
+            store.set('phone_number', telemovel.value);
             router.push('/dashboard');
           }
         }, (error) => {
