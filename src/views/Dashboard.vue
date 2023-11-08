@@ -1,7 +1,14 @@
 <template>
   <ion-page>
-    <div>
-      dashboard
+    <io-header>
+      <ion-toolbar>
+        <ion-buttons slot="start">
+          <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+        <ion-title>Dashboard</ion-title>
+      </ion-toolbar>
+    </io-header>
+    <ion-content>
       <div>
         <div v-if="loading">
             <ion-spinner></ion-spinner>
@@ -10,7 +17,10 @@
             <Balance></Balance>
           </div>
       </div>
-    </div>
+    </ion-content>
+
+
+    
     </ion-page>
   </template>
   
