@@ -35,20 +35,21 @@
   import { ref, inject, onBeforeMount } from 'vue';
   import { useRouter } from 'vue-router';
   import { Storage } from '@ionic/storage';
-  import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonInput, IonButton } from '@ionic/vue';
+  import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonInput, IonButton, onIonViewDidEnter } from '@ionic/vue';
   
   const axios = inject('axios');
   const router = useRouter();
 
   const store = new Storage();
-  store.create();
 
-  onBeforeMount(() => {
-    store.get('token').then((name) => {
-      if (name){
-        router.push('/dashboard');
-      }
-    });
+  onIonViewDidEnter(async () => {
+    await store.create();
+
+    const token = await store.get('token')
+    if (token){
+      router.push('/dashboard');
+    }
+
   });
 
   const telemovel = ref('');
@@ -87,9 +88,15 @@
         }).then(async (response) => {
           console.log(response.data);
           if (response.data.access_token){
-            store.set('token', response.data.access_token);
-            store.set('phone_number', telemovel.value);
-            router.push('/dashboard');
+
+            try{
+              await store.set('token', response.data.access_token);
+              await store.set('phone_number', telemovel.value);
+              router.push('/dashboard');
+            } catch (error){
+              console.log(error);
+            }
+           
           }
         }, (error) => {
           console.log(error);

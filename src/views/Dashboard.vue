@@ -25,8 +25,8 @@
   </template>
   
   <script setup>
-  import { ref, inject, onBeforeMount } from 'vue';
-  import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonSpinner  } from '@ionic/vue';
+  import { ref, inject } from 'vue';
+  import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonSpinner, onIonViewWillEnter  } from '@ionic/vue';
   import { Storage } from '@ionic/storage';
   import { useRouter } from 'vue-router';
 
@@ -35,27 +35,30 @@
   const phone = ref('');
   const loading = ref(true);
 
-  const store = new Storage();
-  store.create();
 
   const axios = inject('axios');
 
   const router = useRouter();
 
-  onBeforeMount(() => {
-    store.get('token').then((token) => {
+  onIonViewWillEnter(async () => {
+    console.log('mounted')
+    const store = new Storage();
+    await store.create();
+    const token = await store.get('token')
+
+    console.log(token)
     if (!token){
       router.push('/login');
     }else{
       axios.defaults.headers.common.Authorization = 'Bearer ' + token;
-      store.get('phone_number').then((phoneNumber) => {
-        if (phoneNumber){
-          phone.value = phoneNumber;
-        }
-        loading.value = false;
-      });
+      const phoneNumber = await store.get('phone_number')
+      console.log('phone number', phoneNumber);
+      if (phoneNumber){
+        phone.value = phoneNumber;
+      }
+      loading.value = false;
     }
-  });
+    
   });
 
 
