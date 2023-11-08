@@ -24,7 +24,7 @@
     </ion-page>
   </template>
   
-  <script setup lang="ts">
+  <script setup>
   import { ref, inject, onBeforeMount } from 'vue';
   import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonSpinner  } from '@ionic/vue';
   import { Storage } from '@ionic/storage';
@@ -51,8 +51,8 @@
       store.get('phone_number').then((phoneNumber) => {
         if (phoneNumber){
           phone.value = phoneNumber;
-          loading.value = false;
         }
+        loading.value = false;
       });
     }
   });
