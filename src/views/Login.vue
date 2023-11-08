@@ -84,10 +84,10 @@
           username: telemovel.value,
           password: password.value,
           confirmation_code: pin.value
-        }).then((response) => {
+        }).then(async (response) => {
           console.log(response.data);
           if (response.data.access_token){
-            store.set('token', response.data.access_token);
+            await store.set('token', response.data.access_token);
             router.push('/dashboard');
           }
         }, (error) => {
