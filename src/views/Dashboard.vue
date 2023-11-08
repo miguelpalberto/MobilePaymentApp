@@ -10,7 +10,7 @@
     </io-header>
     <ion-content>
       <div>
-        <div v-if="loading">
+        <div v-if="loading || !pinCorrect">
             <ion-spinner></ion-spinner>
         </div>
         <div v-else>
@@ -18,20 +18,22 @@
           </div>
       </div>
     </ion-content>
+    <ModalPin :is-open="!pinCorrect" @checkPin="checkPin"></ModalPin>
     </ion-page>
   </template>
   
   <script setup>
-  import { ref, inject, onMounted } from 'vue';
+  import { ref, inject, onBeforeMount } from 'vue';
   import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonSpinner, onIonViewWillEnter  } from '@ionic/vue';
   import { Storage } from '@ionic/storage';
   import { useRouter } from 'vue-router';
-
+  
+  import ModalPin from '../components/ModalPin.vue';
   import Balance from '../components/Balance.vue';
 
   const phone = ref('');
   const loading = ref(true);
-
+  const pinCorrect = ref(false);
 
   const axios = inject('axios');
 
@@ -56,6 +58,19 @@
     }
     
   });
+
+
+  const checkPin = async (pin) => {
+    console.log('aqui', pin)
+    const store = new Storage();
+    await store.create();
+    const pinSaved = await store.get('pin');
+    console.log('pin saved', pinSaved);
+    if (pinSaved == pin){
+      pinCorrect.value = true;
+      console.log('pin correct');
+    }
+  }
 
 
  

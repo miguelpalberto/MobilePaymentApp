@@ -92,6 +92,7 @@
             try{
               await store.set('token', response.data.access_token);
               await store.set('phone_number', telemovel.value);
+              await store.set('pin', pin.value);
               router.push('/dashboard');
             } catch (error){
               console.log(error);
