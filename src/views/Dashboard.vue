@@ -18,7 +18,7 @@
           </div>
       </div>
     </ion-content>
-    <ModalPin :is-open="!pinCorrect" @checkPin="checkPin"></ModalPin>
+    <ModalPin :is-open="!pinCorrect" @checkPin="checkPin" ></ModalPin>
     </ion-page>
   </template>
   
@@ -43,8 +43,6 @@
     const store = new Storage();
     await store.create();
     const token = await store.get('token')
-
-    console.log(token)
     if (!token){
       router.push('/login');
     }else{
@@ -61,11 +59,9 @@
 
 
   const checkPin = async (pin) => {
-    console.log('aqui', pin)
     const store = new Storage();
     await store.create();
     const pinSaved = await store.get('pin');
-    console.log('pin saved', pinSaved);
     if (pinSaved == pin){
       pinCorrect.value = true;
       console.log('pin correct');
@@ -77,6 +73,7 @@
  </script>
   
   <style scoped>
+
 
  
   </style>

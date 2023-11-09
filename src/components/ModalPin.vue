@@ -19,7 +19,7 @@
           <ion-label position="floating">Pin</ion-label>
           <ion-input type="password" v-model="pin"></ion-input>
         </ion-item>
-        <ion-button class="enter" expand="block" @click="checkPin">Enter</ion-button>
+        <ion-button color="medium" class="enter" expand="block" @click="checkPin">Enter</ion-button>
       </ion-content>
     </ion-modal>
   </ion-content>
@@ -63,6 +63,7 @@
 <style>
   ion-modal {
     --height: 50%;
+    --width: 90%;
     --border-radius: 16px;
     --box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   }
@@ -79,5 +80,8 @@
 
   .enter{
     margin-top: 40px;
+    margin-left: 40px;
+    margin-right: 40px;
   }
+
 </style>
