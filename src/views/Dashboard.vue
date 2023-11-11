@@ -14,8 +14,13 @@
             <ion-spinner></ion-spinner>
         </div>
         <div v-else>
-            <Balance :phone="phone"></Balance>
-          </div>
+          <ion-grid>
+            <ion-row>
+              <PiggyBankBalance :phone="phone"></PiggyBankBalance>
+              <Balance :phone="phone"></Balance>
+            </ion-row>
+          </ion-grid>
+        </div>
       </div>
     </ion-content>
     <ModalPin :is-open="!pinCorrect" @checkPin="checkPin" ></ModalPin>
@@ -24,12 +29,13 @@
   
   <script setup>
   import { ref, inject, onBeforeMount } from 'vue';
-  import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonSpinner, onIonViewWillEnter  } from '@ionic/vue';
+  import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonSpinner, onIonViewWillEnter, IonGrid, IonRow } from '@ionic/vue';
   import { Storage } from '@ionic/storage';
   import { useRouter } from 'vue-router';
   
   import ModalPin from '../components/ModalPin.vue';
   import Balance from '../components/Balance.vue';
+  import PiggyBankBalance from '../components/PiggyBankBalance.vue';
 
   const phone = ref('');
   const loading = ref(true);
@@ -73,7 +79,7 @@
  </script>
   
   <style scoped>
-
+  
 
  
   </style>
