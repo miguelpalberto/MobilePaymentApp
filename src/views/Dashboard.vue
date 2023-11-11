@@ -11,7 +11,7 @@
     <ion-content>
       <div>
         <div v-if="loading || !pinCorrect">
-            <ion-spinner></ion-spinner>
+          <ion-spinner></ion-spinner>
         </div>
         <div v-else>
           <ion-grid>
@@ -20,6 +20,7 @@
               <Balance :phone="phone"></Balance>
             </ion-row>
           </ion-grid>
+          <ion-button :router-link="transactionUrl">Transactions</ion-button>
         </div>
       </div>
     </ion-content>
@@ -27,60 +28,57 @@
     </ion-page>
   </template>
   
-  <script setup>
-  import { ref, inject, onBeforeMount } from 'vue';
-  import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonSpinner, onIonViewWillEnter, IonGrid, IonRow } from '@ionic/vue';
-  import { Storage } from '@ionic/storage';
-  import { useRouter } from 'vue-router';
-  
-  import ModalPin from '../components/ModalPin.vue';
-  import Balance from '../components/Balance.vue';
-  import PiggyBankBalance from '../components/PiggyBankBalance.vue';
+<script setup>
+import { ref, inject, onBeforeMount, computed } from 'vue';
+import { IonButtons, IonButton, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonSpinner, onIonViewWillEnter, IonRow } from '@ionic/vue';
+import { Storage } from '@ionic/storage';
+import { useRouter } from 'vue-router';
 
-  const phone = ref('');
-  const loading = ref(true);
-  const pinCorrect = ref(false);
+import ModalPin from '../components/ModalPin.vue';
+import Balance from '../components/Balance.vue';
+import PiggyBankBalance from '../components/PiggyBankBalance.vue';
 
-  const axios = inject('axios');
+const phone = ref('');
+const loading = ref(true);
+const pinCorrect = ref(false);
 
-  const router = useRouter();
+const axios = inject('axios');
 
-  onIonViewWillEnter(async () => {
-    const store = new Storage();
-    await store.create();
-    const token = await store.get('token')
-    if (!token){
-      router.push('/login');
-    }else{
-      axios.defaults.headers.common.Authorization = 'Bearer ' + token;
-      const phoneNumber = await store.get('phone_number')
-      console.log('phone number', phoneNumber);
-      if (phoneNumber){
-        phone.value = phoneNumber;
-      }
-      loading.value = false;
+const router = useRouter();
+
+const transactionUrl = computed (() => {
+  return `/transactions/${phone.value}`;
+});
+
+onIonViewWillEnter(async () => {
+  const store = new Storage();
+  await store.create();
+  const token = await store.get('token')
+  if (!token) {
+    router.push('/login');
+  } else {
+    axios.defaults.headers.common.Authorization = 'Bearer ' + token;
+    const phoneNumber = await store.get('phone_number')
+    console.log('phone number', phoneNumber);
+    if (phoneNumber) {
+      phone.value = phoneNumber;
     }
-    
-  });
-
-
-  const checkPin = async (pin) => {
-    const store = new Storage();
-    await store.create();
-    const pinSaved = await store.get('pin');
-    if (pinSaved == pin){
-      pinCorrect.value = true;
-      console.log('pin correct');
-    }
+    loading.value = false;
   }
 
+});
 
- 
- </script>
-  
-  <style scoped>
-  
+const checkPin = async (pin) => {
+  const store = new Storage();
+  await store.create();
+  const pinSaved = await store.get('pin');
+  if (pinSaved == pin) {
+    pinCorrect.value = true;
+    console.log('pin correct');
+  }
+}
 
- 
-  </style>
+</script>
+  
+<style scoped></style>
   
