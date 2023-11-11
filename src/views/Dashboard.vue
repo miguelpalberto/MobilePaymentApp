@@ -14,23 +14,29 @@
           <ion-spinner></ion-spinner>
         </div>
         <div v-else>
+          <ion-grid>
+            <ion-row>
+              <PiggyBankBalance :phone="phone"></PiggyBankBalance>
+              <Balance :phone="phone"></Balance>
+            </ion-row>
+          </ion-grid>
           <ion-button :router-link="transactionUrl">Transactions</ion-button>
-          <Balance :phone="phone"></Balance>
         </div>
       </div>
     </ion-content>
-    <ModalPin :is-open="!pinCorrect" @checkPin="checkPin"></ModalPin>
-  </ion-page>
-</template>
+    <ModalPin :is-open="!pinCorrect" @checkPin="checkPin" ></ModalPin>
+    </ion-page>
+  </template>
   
 <script setup>
 import { ref, inject, onBeforeMount, computed } from 'vue';
-import { IonButtons, IonButton, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonSpinner, onIonViewWillEnter } from '@ionic/vue';
+import { IonButtons, IonButton, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonSpinner, onIonViewWillEnter, IonRow } from '@ionic/vue';
 import { Storage } from '@ionic/storage';
 import { useRouter } from 'vue-router';
 
 import ModalPin from '../components/ModalPin.vue';
 import Balance from '../components/Balance.vue';
+import PiggyBankBalance from '../components/PiggyBankBalance.vue';
 
 const phone = ref('');
 const loading = ref(true);
@@ -62,7 +68,6 @@ onIonViewWillEnter(async () => {
 
 });
 
-
 const checkPin = async (pin) => {
   const store = new Storage();
   await store.create();
@@ -72,8 +77,6 @@ const checkPin = async (pin) => {
     console.log('pin correct');
   }
 }
-
-
 
 </script>
   
