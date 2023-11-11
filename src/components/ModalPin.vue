@@ -1,11 +1,6 @@
 
 <template>
-  <ion-header>
-    <ion-toolbar>
-      <ion-title>App</ion-title>
-    </ion-toolbar>
-  </ion-header>
-  <ion-content class="ion-padding">
+
     <ion-modal :is-open="props.isOpen" :can-dismiss="!props.isOpen">
       <ion-content>
         <ion-toolbar>
@@ -22,7 +17,7 @@
         <ion-button color="medium" class="enter" expand="block" @click="checkPin">Enter</ion-button>
       </ion-content>
     </ion-modal>
-  </ion-content>
+
 </template>
 
 <script lang="ts" setup>
