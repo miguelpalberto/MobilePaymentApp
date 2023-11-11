@@ -75,7 +75,7 @@
 
     .transaction-amount {
         align-items: right;
-        color: white; /* Adjust the color as needed */
+        /*color: white;*/
      }
 
 

@@ -1,6 +1,7 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router';
+import config from './utils/config.ts'
 
 import { IonicVue } from '@ionic/vue';
 
@@ -29,12 +30,13 @@ const app = createApp(App)
   .use(IonicVue)
   .use(router);
 
-const apiDomain = 'http://localhost:8000/api' //todo: add config file
+const serverBaseUrl = config.serverBaseUrl
+app.provide('serverBaseUrl', serverBaseUrl)
 
 app.provide(
     'axios',
     axios.create({
-      baseURL: apiDomain,
+      baseURL: serverBaseUrl + '/api',
       headers: {
         'Content-type': 'application/json'
       }

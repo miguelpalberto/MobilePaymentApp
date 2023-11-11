@@ -14,12 +14,27 @@
           <ion-spinner></ion-spinner>
         </div>
         <div v-else>
+
+        <div class="container-init">
           <div class="balance">
             <Balance :phone="phone"></Balance>
           </div>
 
+        <div class="piggy">
+          <ion-grid>
+            <ion-row>
+              <PiggyBankBalance :phone="phone"></PiggyBankBalance>
+            </ion-row>
+          </ion-grid>
+        </div>
+      </div>
+
+            
+
           <div class="container">
-            <div class="middle-box" id="middle-box-1">1</div>
+            <div class="middle-box" id="middle-box-1">
+              <ion-button :router-link="transactionUrl">Transactions</ion-button>
+            </div>
             <div class="middle-box" id="middle-box-2">2</div>
           </div>
           <div class="container">
@@ -33,6 +48,7 @@
 
       <ModalPin :is-open="!pinCorrect" @checkPin="checkPin"></ModalPin>
     </ion-content>
+
   </ion-page>
 </template>
 
@@ -42,9 +58,10 @@
 
 
 <script setup>
-import { ref, inject, onBeforeMount } from "vue";
+import { ref, inject, onBeforeMount, computed } from "vue";
 import {
   IonButtons,
+  IonButton,
   IonContent,
   IonHeader,
   IonMenuButton,
@@ -53,6 +70,7 @@ import {
   IonToolbar,
   IonSpinner,
   onIonViewWillEnter,
+  IonRow,
 } from "@ionic/vue";
 import { Storage } from "@ionic/storage";
 import { useRouter } from "vue-router";
@@ -60,6 +78,7 @@ import { useRouter } from "vue-router";
 import ModalPin from "../components/ModalPin.vue";
 import Balance from "../components/Balance.vue";
 import LastTransaction from "../components/LastTransaction.vue";
+import PiggyBankBalance from '../components/PiggyBankBalance.vue';
 
 const phone = ref("");
 const loading = ref(true);
@@ -68,6 +87,10 @@ const pinCorrect = ref(false);
 const axios = inject("axios");
 
 const router = useRouter();
+
+const transactionUrl = computed (() => {
+  return `/transactions/${phone.value}`;
+});
 
 onIonViewWillEnter(async () => {
   const store = new Storage();
@@ -79,6 +102,7 @@ onIonViewWillEnter(async () => {
     axios.defaults.headers.common.Authorization = "Bearer " + token;
     const phoneNumber = await store.get("phone_number");
     console.log("phone number", phoneNumber);
+
     if (phoneNumber) {
       phone.value = phoneNumber;
     }
@@ -102,6 +126,7 @@ const checkPin = async (pin) => {
 
 
 
+
 <style scoped>
 body {
   margin: 0;
@@ -114,9 +139,25 @@ body {
 main {
   flex: 1;
 }
-.balance {
-  padding-left: 130px;
+
+.container-init{
+  display: flex;
+  justify-content: center;
 }
+.balance {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-items: flex-start;  
+
+}
+.piggy {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-items: flex-end;  
+}
+
 
 .container {
   display: flex;
@@ -126,7 +167,7 @@ main {
 }
 
 .bottom-box {
-  background-color: rgb(43, 43, 61);
+  background-color: rgb(189, 189, 192);
   padding: 10px;
   display: flex;
   flex-direction: column; /* Set to column to stack elements vertically */
@@ -136,8 +177,10 @@ main {
   margin: 10px;
 }
 
+
+
 .middle-box {
-  background-color: rgb(43, 43, 61);
+  background-color: rgb(189, 189, 192);
   padding: 10px;
   flex: 1; /* Use flex: 1 to make the boxes expand and take available space */
   border: 2px solid #1e5ca3;

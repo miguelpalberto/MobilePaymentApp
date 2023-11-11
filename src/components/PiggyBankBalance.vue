@@ -1,9 +1,9 @@
 <template>
-    <ion-col class="container">
-        <div >
+    <ion-col>
+        <div class="container">
             <div>
-                <span>Balance</span>
-                <h1 :class="{'balance': balance !=0}">{{ balanceFormatted }}</h1>
+                <span>Piggy Bank</span>
+                <h1 :class="{'balance': piggyBankBalance !=0}">{{ balanceFormatted }}</h1>
             </div>
         </div>
     </ion-col>
@@ -22,16 +22,12 @@
 
     const axios = inject('axios');
 
-    const balance = ref('');
-
-
-
+    const piggyBankBalance = ref('');
 
     const balanceFormatted = computed(() => {
-
-        if (balance.value == 0) {
+        if (piggyBankBalance == undefined || piggyBankBalance.value == 0) {
             //escrever que nao tem saldo
-            return 'No funds';
+            return 'No balance';
         }
 
         const formatter = new Intl.NumberFormat('pt', {
@@ -40,41 +36,34 @@
             maximumFractionDigits: 2
         });
 
-    const formattedNumber = formatter.format(balance.value);
-    return `${formattedNumber} €`; // Add the Euro symbol to the right
-});
+        const formattedNumber = formatter.format(piggyBankBalance.value);
+        return `${formattedNumber} €`; // Add the Euro symbol to the right
+    });
 
-    const getBalance = () => {
-
+    const getPiggyBankBalance = () => {
         axios.get(`/vcard/${props.phone}`).then((response) => {
-            console.log(response.data.data.balance);
-            balance.value = response.data.data.balance;
-            // balance.value = "0.00"
+            piggyBankBalance.value = response.data.data.piggy_bank_balance;
         });
     }
 
     onMounted(() => {
-        // getBalance();
-        getBalance();
-        // console.log(axios.defaults.headers.common.Authorization )
+        getPiggyBankBalance();
     });
 
 
 </script>
 
 <style scoped>
-    .container{
-       margin-top: 4px;
-       margin-right: 20px;
-    } 
+    /* .container{
+        display: flex;
+        justify-content: start;
+    } */
 
     .balance{
         font-weight: 700;
         font-size: 30px;
         padding: 0;
         margin: 0;
-        
-
     }
 
     span{
