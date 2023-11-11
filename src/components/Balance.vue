@@ -1,6 +1,6 @@
 <template>
-    <ion-col>
-        <div class="container">
+    <ion-col class="container">
+        <div >
             <div>
                 <span>Balance</span>
                 <h1 :class="{'balance': balance !=0}">{{ balanceFormatted }}</h1>
@@ -31,7 +31,7 @@
 
         if (balance.value == 0) {
             //escrever que nao tem saldo
-            return 'No balance';
+            return 'No funds';
         }
 
         const formatter = new Intl.NumberFormat('pt', {
@@ -63,16 +63,17 @@
 </script>
 
 <style scoped>
-    /* .container{
-        display: flex;
-        justify-content: start;
-    } */
+    .container{
+       margin-top: 4px;
+       margin-right: 20px;
+    } 
 
     .balance{
         font-weight: 700;
         font-size: 30px;
         padding: 0;
         margin: 0;
+        
 
     }
 
