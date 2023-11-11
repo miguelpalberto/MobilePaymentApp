@@ -17,6 +17,11 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/folder/:id',
     component: () => import ('../views/FolderPage.vue')
+  },
+  {
+    path: '/transactions/:phone',
+    props: (route) => ({ phone: route.params.phone }),
+    component: () => import ('../components/Transactions.vue')
   }
 ]
 
