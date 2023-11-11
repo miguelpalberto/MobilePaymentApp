@@ -35,20 +35,21 @@
   import { ref, inject, onBeforeMount } from 'vue';
   import { useRouter } from 'vue-router';
   import { Storage } from '@ionic/storage';
-  import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonInput, IonButton } from '@ionic/vue';
+  import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonInput, IonButton, onIonViewDidEnter, onIonViewWillEnter } from '@ionic/vue';
   
   const axios = inject('axios');
   const router = useRouter();
 
   const store = new Storage();
-  store.create();
 
-  onBeforeMount(() => {
-    store.get('token').then((name) => {
-      if (name){
-        router.push('/dashboard');
-      }
-    });
+  onIonViewWillEnter(async () => {
+    await store.create();
+
+    const token = await store.get('token')
+    if (token){
+      router.push('/dashboard');
+    }
+
   });
 
   const telemovel = ref('');
@@ -84,12 +85,19 @@
           username: telemovel.value,
           password: password.value,
           confirmation_code: pin.value
-        }).then((response) => {
+        }).then(async (response) => {
           console.log(response.data);
           if (response.data.access_token){
-            store.set('token', response.data.access_token);
-            store.set('phone_number', telemovel.value);
-            router.push('/dashboard');
+
+            try{
+              await store.set('token', response.data.access_token);
+              await store.set('phone_number', telemovel.value);
+              await store.set('pin', pin.value);
+              router.push('/dashboard');
+            } catch (error){
+              console.log(error);
+            }
+           
           }
         }, (error) => {
           console.log(error);
