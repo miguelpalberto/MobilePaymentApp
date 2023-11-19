@@ -15,6 +15,21 @@
         </div>
         <div v-else>
 
+
+          <div>
+            <div>
+              Welcome, {{ phone }}<!-- //todo mudar para nome -->
+              
+              <div>
+                <ion-button :router-link="vcardUrl">User</ion-button>
+              </div>
+            </div>
+          </div>
+
+
+
+
+
         <div class="container-init">
           <div class="balance">
             <Balance :phone="phone"></Balance>
@@ -90,6 +105,9 @@ const router = useRouter();
 
 const transactionUrl = computed (() => {
   return `/transactions/${phone.value}`;
+});
+const vcardUrl = computed(() => {
+  return `/mydetails/${phone.value}`;
 });
 
 onIonViewWillEnter(async () => {
