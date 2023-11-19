@@ -1,22 +1,22 @@
 <template>
-    <ion-page >
-      <ion-header>
-        <ion-toolbar>
-          <ion-title>User details</ion-title>
-        </ion-toolbar>
-      </ion-header>
-      <ion-content :fullscreen="true" class="ion-padding">
+  <ion-page>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>User details</ion-title>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content :fullscreen="true" class="ion-padding">
 
-        <ion-item v-if="isLoading">
-          <ion-spinner></ion-spinner>
-        </ion-item>
-        <ion-avatar v-else>
-          <img v-if="photoUrl == null" alt="User photo" src="https://ionicframework.com/docs/img/demos/avatar.svg" />
-          <img v-else alt="User photo" :src="photoUrl" />
-        </ion-avatar>
-        
+      <ion-item v-if="isLoading">
+        <ion-spinner></ion-spinner>
+      </ion-item>
+      <ion-avatar v-else>
+        <img v-if="photoUrl == null" alt="User photo" src="https://ionicframework.com/docs/img/demos/avatar.svg" />
+        <img v-else alt="User photo" :src="photoUrl" />
+      </ion-avatar>
 
-        <div class="container" style="margin-top: 10%;">
+
+      <div class="container" style="margin-top: 10%;">
         <ion-list class="list-container" v-if="!isEditing">
           <ion-item v-if="!isEditing">
             <ion-input label="Phone number" v-model="phoneNumber" label-placement="stacked" :readonly="true"></ion-input>
@@ -27,7 +27,7 @@
           <ion-item>
             <ion-input label="Email" v-model="vcard.email" label-placement="stacked" :readonly="true"></ion-input>
           </ion-item>
-          
+
           <!-- <ion-item>
             <ion-input label="Password" v-model="maskedPassword" label-placement="stacked" :readonly="true"></ion-input>
           </ion-item>
@@ -55,38 +55,38 @@
         </ion-list>
         <br>
         <br>
-        <ion-button expand="block" @click="toggleEditMode">{{ isEditing ? 'Save' : 'Edit' }}</ion-button>
+        <ion-button expand="block" :color="isEditing ? 'secondary' : 'primary'" @click="toggleEditMode"> {{ isEditing ? 'Save' : 'Edit' }}</ion-button>
         <!-- <ion-button expand="block" @click="toggleEditMode">{{ isEditing ? 'Save' : 'Change Password and PIN' }}</ion-button> -->
-        
-        </div>
+
+      </div>
 
 
-     <!-- Modals -->
-<!-- Success Modal -->
-<ion-modal v-if="showSuccessModal" :is-open="showSuccessModal">
-  <ion-content class="ion-text-center">
-    <ion-card>
-      <ion-card-content>
-        <ion-card-title>Success</ion-card-title>
-        <p>Your changes have been updated successfully!</p>
-      </ion-card-content>
-    </ion-card>
-    <ion-button expand="full" color="success" @click="closeModals">Close</ion-button>
-  </ion-content>
-</ion-modal>
+      <!-- Modals -->
+      <!-- Success Modal -->
+      <ion-modal v-if="showSuccessModal" :is-open="showSuccessModal">
+        <ion-content class="ion-text-center">
+          <ion-card>
+            <ion-card-content>
+              <ion-card-title>Success</ion-card-title>
+              <p>Your changes have been updated successfully!</p>
+            </ion-card-content>
+          </ion-card>
+          <ion-button expand="full" color="success" @click="closeModals">Close</ion-button>
+        </ion-content>
+      </ion-modal>
 
-<!-- Error Modal -->
-<ion-modal v-if="showErrorModal" :is-open="showErrorModal">
-  <ion-content class="ion-text-center">
-    <ion-card>
-      <ion-card-content>
-        <ion-card-title>Error</ion-card-title>
-        <p>There was an error updating your changes. Please try again.</p>
-      </ion-card-content>
-    </ion-card>
-    <ion-button expand="full" color="danger" @click="closeModals">Close</ion-button>
-  </ion-content>
-</ion-modal>
+      <!-- Error Modal -->
+      <ion-modal v-if="showErrorModal" :is-open="showErrorModal">
+        <ion-content class="ion-text-center">
+          <ion-card>
+            <ion-card-content>
+              <ion-card-title>Error</ion-card-title>
+              <p>There was an error updating your changes. Please try again.</p>
+            </ion-card-content>
+          </ion-card>
+          <ion-button expand="full" color="danger" @click="closeModals">Close</ion-button>
+        </ion-content>
+      </ion-modal>
 
     </ion-content>
   </ion-page>
