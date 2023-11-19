@@ -59,25 +59,54 @@
         <!-- <ion-button expand="block" @click="toggleEditMode">{{ isEditing ? 'Save' : 'Change Password and PIN' }}</ion-button> -->
         
         </div>
-      </ion-content>
-    </ion-page>
+
+
+     <!-- Modals -->
+<!-- Success Modal -->
+<ion-modal v-if="showSuccessModal" :is-open="showSuccessModal">
+  <ion-content class="ion-text-center">
+    <ion-card>
+      <ion-card-content>
+        <ion-card-title>Success</ion-card-title>
+        <p>Your changes have been updated successfully!</p>
+      </ion-card-content>
+    </ion-card>
+    <ion-button expand="full" color="success" @click="closeModals">Close</ion-button>
+  </ion-content>
+</ion-modal>
+
+<!-- Error Modal -->
+<ion-modal v-if="showErrorModal" :is-open="showErrorModal">
+  <ion-content class="ion-text-center">
+    <ion-card>
+      <ion-card-content>
+        <ion-card-title>Error</ion-card-title>
+        <p>There was an error updating your changes. Please try again.</p>
+      </ion-card-content>
+    </ion-card>
+    <ion-button expand="full" color="danger" @click="closeModals">Close</ion-button>
+  </ion-content>
+</ion-modal>
+
+    </ion-content>
+  </ion-page>
 </template>
   
 <script setup>
 import { ref, inject, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { create } from 'ionicons/icons';
-import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonInput, IonButton,
-   IonAvatar, IonSpinner} from '@ionic/vue';
+import { IonPage, IonContent, IonList, IonItem, IonInput, IonButton, IonAvatar, IonSpinner } from '@ionic/vue';
 
 const axios = inject('axios');
-const router = useRouter();
 const props = defineProps({
-    phone: {
-        type: String,
-        required: true
-    }
+  phone: {
+    type: String,
+    required: true
+  }
 });
+
+const originalName = ref('');
+const originalEmail = ref('');
+const originalEditing = ref(false);
 
 const phoneNumber = ref(props.phone);
 const isLoading = ref(true);
@@ -85,19 +114,23 @@ const vcard = ref({});
 const photoUrl = ref('');
 
 onMounted(() => {
-    axios.get(`vcard/${props.phone}`).then((response) => {
-        vcard.value = response.data.data;
-        console.log(vcard.value)
-        isLoading.value = false;
-        if(vcard.value.photo_url == undefined){
-          photoUrl.value = null
-        } else {
-          photoUrl.value = `http://localhost/taes_backend/public/storage/fotos/${vcard.value.photo_url}`;
-        }
-    })
+  axios.get(`vcard/${props.phone}`).then((response) => {
+    vcard.value = response.data.data;
+    isLoading.value = false;
+    if (vcard.value.photo_url == undefined) {
+      photoUrl.value = null
+    } else {
+      photoUrl.value = `http://localhost/taes_backend/public/storage/fotos/${vcard.value.photo_url}`;
+    }
+
+    // Store original values
+    originalName.value = vcard.value.name;
+    originalEmail.value = vcard.value.email;
+    originalEditing.value = false;
+  })
     .catch((error) => {
-      console.log(error)
-    })
+      console.log(error);
+    });
 });
 
 const maskedPassword = "********"; //computed(() => '*'.repeat(8));
@@ -106,34 +139,50 @@ const maskedPIN = "***"; //computed(() => '*'.repeat(3));
 const editablePassword = ref('');
 const editablePIN = ref('');
 const isEditing = ref(false);
+const showSuccessModal = ref(false);
+const showErrorModal = ref(false);
 
 const toggleEditMode = async () => {
   if (isEditing.value) {
-    // Save changes
     try {
       await axios.put(`vcard/${props.phone}`, {
         name: vcard.value.name,
         email: vcard.value.email,
-        //password: editablePassword.value,
-        //pin: editablePIN.value,
+        // password: editablePassword.value,
+        // pin: editablePIN.value,
       });
 
-      // Optionally update the local vcard with the edited values
-      vcard.value.name = vcard.value.name;
-      vcard.value.email = vcard.value.email;
-      //vcard.value.password = editablePassword.value;
-      //vcard.value.pin = editablePIN.value;
+      // Show success modal
+      showSuccessModal.value = true;
 
-      // Perform any additional actions after successful save
+      // Additional actions after successful save
+      originalName.value = vcard.value.name;
+      originalEmail.value = vcard.value.email;
+      originalEditing.value = false;
+
     } catch (error) {
       console.error('Error saving changes:', error);
+
+      // Show error modal
+      showErrorModal.value = true;
+
+      // Revert changes on error
+      vcard.value.name = originalName.value;
+      vcard.value.email = originalEmail.value;
+      isEditing.value = originalEditing.value;
     }
   } else {
     // Enter edit mode
-    //editablePassword.value = vcard.value.password;
-    //editablePIN.value = vcard.value.pin;
+    // editablePassword.value = vcard.value.password;
+    // editablePIN.value = vcard.value.pin;
+    originalEditing.value = isEditing.value;
   }
 
   isEditing.value = !isEditing.value;
+};
+
+const closeModals = () => {
+  showSuccessModal.value = false;
+  showErrorModal.value = false;
 };
 </script>
