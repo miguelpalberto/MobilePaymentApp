@@ -76,13 +76,17 @@ import Balance from "../components/Balance.vue";
 import LastTransaction from "../components/LastTransaction.vue";
 import PiggyBankBalance from '../components/PiggyBankBalance.vue';
 
-const phone = ref("");
-const loading = ref(true);
+import { useRoute } from 'vue-router';
+const route = useRoute();
+
+const phone = ref(route.params.phoneNumber);
+const loading = ref(false);
 const pinCorrect = ref(false);
 
-const axios = inject("axios");
-
 const router = useRouter();
+
+
+
 
 const transactionUrl = computed (() => {
   return `/transactions/${phone.value}`;
@@ -93,21 +97,21 @@ const piggyBankUrl = computed (() => {
 });
 
 onIonViewWillEnter(async () => {
-  const store = new Storage();
-  await store.create();
-  const token = await store.get("token");
-  if (!token) {
-    router.push("/login");
-  } else {
-    axios.defaults.headers.common.Authorization = "Bearer " + token;
-    const phoneNumber = await store.get("phone_number");
-    console.log("phone number", phoneNumber);
+  // const store = new Storage();
+  // await store.create();
+  // const token = await store.get("token");
+  // if (!token) {
+  //   router.push("/login");
+  // } else {
+  //   axios.defaults.headers.common.Authorization = "Bearer " + token;
+  //   const phoneNumber = await store.get("phone_number");
+  //   console.log("phone number", phoneNumber);
 
-    if (phoneNumber) {
-      phone.value = phoneNumber;
-    }
-    loading.value = false;
-  }
+  //   if (phoneNumber) {
+  //     phone.value = phoneNumber;
+  //   }
+  //   loading.value = false;
+  // }
 });
 
 const checkPin = async (pin) => {

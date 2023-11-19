@@ -32,10 +32,10 @@
             <ion-col>
               <span style="font-size:40px">€</span>
             </ion-col>
+            <!-- {{ newBalance  }} -->
         </ion-row> 
         <ion-row>
             <ion-col size="12" style="display:flex; flex-direction: column; justify-content: center; align-items: center; gap: 10px">
-                
                 <ion-button @click="applyChanges">Apply</ion-button> 
                 <ion-label style="color: red; font-size: 12px"  v-if="errors && errors.piggy_bank_balance">
                     {{ errors.piggy_bank_balance[0] }}
@@ -49,10 +49,11 @@
   <script setup>
   import { ref, inject, computed, onMounted } from 'vue';
   import { IonPage, IonHeader, IonToolbar, IonContent, IonIcon, IonInput, IonRow, IonCol, IonButton, IonTitle } from '@ionic/vue';
-  import { arrowDownOutline, arrowBackOutline, arrowForwardOutline } from 'ionicons/icons';
+  import { arrowBackOutline, arrowForwardOutline } from 'ionicons/icons';
   
+  // import axios from 'axios';
   const axios = inject('axios')
- const errors = ref({})
+   const errors = ref({})
 
   const formatter = new Intl.NumberFormat('pt', {
             style: 'decimal',
@@ -126,6 +127,8 @@
             console.log(response)
             vCard.value.balance = response.data.data.balance
             vCard.value.piggy_bank_balance = response.data.data.piggy_bank_balance
+
+            totalVault.value = 0
         }
         catch(error){
             if (error.response.status === 422){
@@ -152,9 +155,6 @@
       await updatePiggyBankBalance(piggy_bank_balance)
     };
 
-    const cancelChanges = () => {
-    // Cancel changes logic
-    };
 
     const switchFlow = () => {
         isWithdrawingFromAvailableBalance.value = !isWithdrawingFromAvailableBalance.value
