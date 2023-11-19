@@ -27,7 +27,6 @@ const routes: Array<RouteRecordRaw> = [
     path: '/mydetails/:phone',
     props: (route) => ({ phone: route.params.phone }),
     component: () => import ('../components/UserDetails.vue')
-    
   },
 ]
 
