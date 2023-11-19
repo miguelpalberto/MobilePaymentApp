@@ -114,6 +114,9 @@ onIonViewWillEnter(async () => {
   // }
 });
 
+
+
+
 const checkPin = async (pin) => {
   const store = new Storage();
   await store.create();

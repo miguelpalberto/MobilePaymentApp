@@ -10,7 +10,7 @@
 </template>
   
 <script setup >
-    import {inject, onMounted, ref, computed} from 'vue';
+    import {inject, onMounted, ref, computed, onUnmounted} from 'vue';
     import { IonCol } from '@ionic/vue';
 
     const props = defineProps({
@@ -46,9 +46,19 @@
         });
     }
 
+
+    let interval = null;
     onMounted(() => {
+        interval = setInterval(() => {
+            getPiggyBankBalance();
+        }, 3000);
         getPiggyBankBalance();
+        
     });
+
+    onUnmounted(() => {
+        clearInterval(interval);
+    })
 
 
 </script>
