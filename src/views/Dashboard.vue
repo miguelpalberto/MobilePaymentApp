@@ -29,13 +29,13 @@
         </div>
       </div>
 
-            
-
           <div class="container">
             <div class="middle-box" id="middle-box-1">
               <ion-button :router-link="transactionUrl">Transactions</ion-button>
             </div>
-            <div class="middle-box" id="middle-box-2">2</div>
+            <div class="middle-box" id="middle-box-2">
+              <ion-button :router-link="piggyBankUrl">Piggy Bank Vault</ion-button>
+            </div>
           </div>
           <div class="container">
             <div class="middle-box" id="middle-box-3">3</div>
@@ -52,11 +52,6 @@
   </ion-page>
 </template>
 
-
-
-
-
-
 <script setup>
 import { ref, inject, onBeforeMount, computed } from "vue";
 import {
@@ -71,6 +66,7 @@ import {
   IonSpinner,
   onIonViewWillEnter,
   IonRow,
+  IonGrid,
 } from "@ionic/vue";
 import { Storage } from "@ionic/storage";
 import { useRouter } from "vue-router";
@@ -90,6 +86,10 @@ const router = useRouter();
 
 const transactionUrl = computed (() => {
   return `/transactions/${phone.value}`;
+});
+
+const piggyBankUrl = computed (() => {
+  return `/piggyBank/${phone.value}`;
 });
 
 onIonViewWillEnter(async () => {
@@ -120,12 +120,6 @@ const checkPin = async (pin) => {
   }
 };
 </script>
-
-
-
-
-
-
 
 <style scoped>
 body {

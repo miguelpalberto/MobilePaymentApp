@@ -22,7 +22,12 @@ const routes: Array<RouteRecordRaw> = [
     path: '/transactions/:phone',
     props: (route) => ({ phone: route.params.phone }),
     component: () => import ('../components/Transactions.vue')
-  }
+  },
+  {
+    path: '/piggyBank/:phone',
+    props: (route) => ({ phone: route.params.phone }),
+    component: () => import ('../components/PiggyBank.vue')
+  },
 ]
 
 const router = createRouter({
