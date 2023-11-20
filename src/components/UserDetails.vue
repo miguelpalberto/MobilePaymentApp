@@ -169,7 +169,7 @@ const toggleEditMode = async () => {
       // Revert changes on error
       vcard.value.name = originalName.value;
       vcard.value.email = originalEmail.value;
-      isEditing.value = originalEditing.value;
+      
     }
   } else {
     // Enter edit mode
