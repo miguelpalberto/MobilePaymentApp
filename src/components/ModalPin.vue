@@ -1,38 +1,20 @@
 
 <template>
-
     <ion-modal :is-open="props.isOpen" :can-dismiss="!props.isOpen">
-      <ion-content>
-        <ion-toolbar>
-          <ion-title>Pin</ion-title>
-          <!-- <ion-buttons slot="end">
-            <ion-button color="light" @click="dismiss()">Close</ion-button>
-          </ion-buttons> -->
-        </ion-toolbar>
-        <!-- input para o pin -->
         <ion-item>
           <ion-label position="floating">Pin</ion-label>
           <ion-input type="password" v-model="pin"></ion-input>
         </ion-item>
         <ion-button color="medium" class="enter" expand="block" @click="checkPin">Enter</ion-button>
-      </ion-content>
     </ion-modal>
 
 </template>
 
 <script lang="ts" setup>
   import {
-    IonButtons,
     IonButton,
     IonModal,
-    IonHeader,
-    IonContent,
-    IonToolbar,
-    IonTitle,
     IonItem,
-    IonList,
-    IonAvatar,
-    IonImg,
     IonLabel,
     IonInput,
   } from '@ionic/vue';

@@ -90,13 +90,18 @@
 
     </ion-content>
   </ion-page>
+
 </template>
   
 <script setup>
 import { ref, inject, onMounted } from 'vue';
 import { IonPage, IonContent, IonList, IonItem, IonInput, IonButton, IonAvatar, IonSpinner } from '@ionic/vue';
+import { useRouter } from 'vue-router'
 
 const axios = inject('axios');
+
+const serverBaseUrl = inject('serverBaseUrl');
+const router = useRouter();
 const props = defineProps({
   phone: {
     type: String,
@@ -114,20 +119,21 @@ const vcard = ref({});
 const photoUrl = ref('');
 
 onMounted(() => {
-  axios.get(`vcard/${props.phone}`).then((response) => {
-    vcard.value = response.data.data;
-    isLoading.value = false;
-    if (vcard.value.photo_url == undefined) {
-      photoUrl.value = null
-    } else {
-      photoUrl.value = `http://localhost/taes_backend/public/storage/fotos/${vcard.value.photo_url}`;
-    }
-
+    axios.get(`vcard/${props.phone}`).then((response) => {
+        vcard.value = response.data.data;
+        console.log(vcard.value)
+        isLoading.value = false;
+        if(vcard.value.photo_url == undefined){
+          photoUrl.value = null
+        } else {
+          photoUrl.value = `${serverBaseUrl}/storage/fotos/${vcard.value.photo_url}`;
+        }
     // Store original values
     originalName.value = vcard.value.name;
     originalEmail.value = vcard.value.email;
     originalEditing.value = false;
-  })
+        
+    })
     .catch((error) => {
       console.log(error);
     });
