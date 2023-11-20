@@ -14,6 +14,15 @@
           <ion-spinner></ion-spinner>
         </div>
         <div v-else>
+          <div>
+            <div>
+              Welcome, {{ phone }}<!-- //todo mudar para nome -->
+              
+              <div>
+                <ion-button :router-link="vcardUrl">User</ion-button>
+              </div>
+            </div>
+          </div>
           <ion-grid>
             <ion-row>
               <ion-col size="6">
@@ -114,6 +123,9 @@ const router = useRouter();
 
 const transactionUrl = computed(() => {
   return `/transactions/${phone.value}`;
+});
+const vcardUrl = computed(() => {
+  return `/mydetails/${phone.value}`;
 });
 
 const piggyBankUrl = computed(() => {

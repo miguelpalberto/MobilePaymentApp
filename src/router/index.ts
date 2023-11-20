@@ -33,6 +33,11 @@ export default (axios) => {
       props: (route) => ({ phone: route.params.phone }),
       component: () => import ('../components/PiggyBank.vue')
     },
+    {
+      path: '/mydetails/:phone',
+      props: (route) => ({ phone: route.params.phone }),
+      component: () => import ('../components/UserDetails.vue')
+    }
   ]
   
   const router = createRouter({
