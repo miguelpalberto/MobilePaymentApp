@@ -1,6 +1,6 @@
 import { createApp } from 'vue'
 import App from './App.vue'
-import router from './router';
+import _router from './router';
 import config from './utils/config.ts'
 
 import { IonicVue } from '@ionic/vue';
@@ -24,26 +24,39 @@ import '@ionic/vue/css/display.css';
 /* Theme variables */
 import './theme/variables.css';
 
+import './assets/css/main.css';
+
 import axios from 'axios';
+const serverBaseUrl = config.serverBaseUrl
+
+
+
+const axiosInstance = axios.create({
+  baseURL: serverBaseUrl + '/api',
+  headers: {
+    'Content-type': 'application/json'
+  }
+})
+
+const router = _router(axiosInstance)
+
 
 const app = createApp(App)
   .use(IonicVue)
   .use(router);
 
-const serverBaseUrl = config.serverBaseUrl
 app.provide('serverBaseUrl', serverBaseUrl)
+
+
+
 
 app.provide(
     'axios',
-    axios.create({
-      baseURL: serverBaseUrl + '/api',
-      headers: {
-        'Content-type': 'application/json'
-      }
-    })
+    axiosInstance
   )
   
 
 router.isReady().then(() => {
   app.mount('#app');
 });
+
