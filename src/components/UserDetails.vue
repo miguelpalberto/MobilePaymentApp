@@ -15,7 +15,7 @@
           <img v-else alt="User photo" :src="photoUrl" />
         </ion-avatar>
         
-        <div class="container" style="margin-top: 10%;">
+        <div class="container" style="margin-top: 5%;">
           <ion-list class="list-container">
             <ion-item>
               <ion-input label="Phone number" v-model="phoneNumber" label-placement="stacked" :readonly="true"></ion-input>
@@ -49,6 +49,7 @@ import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem,
    IonAvatar, IonSpinner} from '@ionic/vue';
 
 const axios = inject('axios');
+const serverBaseUrl = inject('serverBaseUrl');
 const router = useRouter();
 const props = defineProps({
     phone: {
@@ -70,7 +71,7 @@ onMounted(() => {
         if(vcard.value.photo_url == undefined){
           photoUrl.value = null
         } else {
-          photoUrl.value = `http://localhost/taes_backend/public/storage/fotos/${vcard.value.photo_url}`;
+          photoUrl.value = `${serverBaseUrl}/storage/fotos/${vcard.value.photo_url}`;
         }
     })
     .catch((error) => {
