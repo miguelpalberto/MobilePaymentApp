@@ -1,17 +1,15 @@
 <template>
-    <ion-col>
-        <div class="container">
-            <div>
-                <span>Piggy Bank</span>
-                <h1 :class="{'balance': piggyBankBalance !=0}">{{ balanceFormatted }}</h1>
-            </div>
-        </div>
-    </ion-col>
+    <ion-card>
+        <ion-card-header>
+            <ion-card-title style="font-size:18px">{{ balanceFormatted }}</ion-card-title>
+            <ion-card-subtitle>Piggy Bank</ion-card-subtitle>
+        </ion-card-header>
+    </ion-card>
 </template>
-  
-<script setup >
+
+<script setup>
     import {inject, onMounted, ref, computed, onUnmounted} from 'vue';
-    import { IonCol } from '@ionic/vue';
+    import { IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle } from '@ionic/vue';
 
     const props = defineProps({
         phone: {
@@ -21,7 +19,6 @@
     });
 
     const axios = inject('axios');
-
     const piggyBankBalance = ref('');
 
     const balanceFormatted = computed(() => {
@@ -46,7 +43,6 @@
         });
     }
 
-
     let interval = null;
     onMounted(() => {
         interval = setInterval(() => {
@@ -60,26 +56,4 @@
         clearInterval(interval);
     })
 
-
 </script>
-
-<style scoped>
-    /* .container{
-        display: flex;
-        justify-content: start;
-    } */
-
-    .balance{
-        font-weight: 700;
-        font-size: 30px;
-        padding: 0;
-        margin: 0;
-    }
-
-    span{
-        font-size: 15px;
-        font-weight: 200;
-    }
-
-</style>
-  

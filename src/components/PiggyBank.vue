@@ -6,6 +6,7 @@
         </ion-toolbar>
       </ion-header>
       <ion-content :fullscreen="true">
+        <br>
         <ion-row>
             <ion-col size="12" style="display:flex; justify-content: center; align-items: center; gap: 5px">
                 <b>Total Balance:</b>
@@ -13,17 +14,17 @@
             </ion-col>
             <ion-col size="12" style="display:flex; justify-content: center; align-items: center; gap: 5px">
                 <div class="transfer-card">
-                    <span class="transfer-card-title">Available Balance</span>
-                    <span class="transfer-card-value">{{availableBalanceFormatted}}</span>
+                    <h4 class="ion-text-center">Available Balance</h4>
+                    <h5 class="transfer-card-value">{{availableBalanceFormatted}}</h5>
                 </div>
                 <div class="flow-transfer-container">
-                    <ion-button fill="clear" style="border-radius: 20px; padding:0; background-color: rgb(37, 203, 224);" @click="switchFlow">
+                    <ion-button fill="clear" style="border-radius: 15px; padding:0; background-color: rgb(37, 203, 224);" @click="switchFlow">
                         <ion-icon style="font-size: 30px;" color="light" :icon="balanceFlowDirectionIcon"></ion-icon>
                     </ion-button>
                 </div>
                 <div class="transfer-card">
-                    <span class="transfer-card-title">Piggy Bank Balance</span>
-                    <span class="transfer-card-value">{{piggyBankBalanceFormatted}}</span>
+                    <h4 class="ion-text-center">Piggy Bank Balance</h4>
+                    <h5 class="transfer-card-value">{{piggyBankBalanceFormatted}}</h5>
                 </div>
             </ion-col>
             <ion-col size="3" offset="4">
@@ -37,7 +38,7 @@
         <ion-row>
             <ion-col size="12" style="display:flex; flex-direction: column; justify-content: center; align-items: center; gap: 10px">
                 <ion-button @click="applyChanges">Apply</ion-button> 
-                <ion-label style="color: red; font-size: 12px"  v-if="errors && errors.piggy_bank_balance">
+                <ion-label style="color: red; font-size: 14px"  v-if="errors && errors.piggy_bank_balance">
                     {{ errors.piggy_bank_balance[0] }}
                 </ion-label>
           </ion-col>
@@ -178,7 +179,7 @@
       justify-content: center;
       align-items: center;
       gap: 5px;
-      padding: 5px;
+      margin: 0 10px;
       border: 1px solid #000;
       border-radius: 10px;
     }
