@@ -1,86 +1,64 @@
 <template>
-    <ion-col class="container">
-        <div >
-            <div>
-                <span>Balance</span>
-                <h1 :class="{'balance': balance !=0}">{{ balanceFormatted }}</h1>
-            </div>
-        </div>
-    </ion-col>
+    <ion-card>
+        <ion-card-header>
+            <ion-card-title style="font-size:18px">{{ balanceFormatted }}</ion-card-title>
+            <ion-card-subtitle>Balance</ion-card-subtitle>
+        </ion-card-header>
+    </ion-card>
 </template>
-  
+
 <script setup >
-    import {inject, onMounted, ref, computed} from 'vue';
-    import { IonCol } from '@ionic/vue';
+import { inject, onMounted, ref, computed, onUnmounted } from 'vue';
+import { IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle } from '@ionic/vue';
+const axios = inject('axios');
 
-    const props = defineProps({
-        phone: {
-            type: String,
-            required: true
-        }
+const props = defineProps({
+    phone: {
+        type: String,
+        required: true
+    }
+});
+
+const balance = ref('');
+const balanceFormatted = computed(() => {
+
+    if (balance.value == 0) {
+        //escrever que nao tem saldo
+        return 'No funds';
+    }
+
+    const formatter = new Intl.NumberFormat('pt', {
+        style: 'decimal',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
     });
-
-    const axios = inject('axios');
-
-    const balance = ref('');
-
-
-
-
-    const balanceFormatted = computed(() => {
-
-        if (balance.value == 0) {
-            //escrever que nao tem saldo
-            return 'No funds';
-        }
-
-        const formatter = new Intl.NumberFormat('pt', {
-            style: 'decimal',
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-        });
 
     const formattedNumber = formatter.format(balance.value);
     return `${formattedNumber} €`; // Add the Euro symbol to the right
 });
 
-    const getBalance = () => {
+const getBalance = () => {
+    axios.get(`/vcard/${props.phone}`).then((response) => {
+        console.log(response.data.data.balance);
+        balance.value = response.data.data.balance;
+    })
+}
 
-        axios.get(`/vcard/${props.phone}`).then((response) => {
-            console.log(response.data.data.balance);
-            balance.value = response.data.data.balance;
-            // balance.value = "0.00"
-        });
-    }
-
-    onMounted(() => {
-        // getBalance();
+let interval = null;
+onMounted(() => {
+    interval = setInterval(() => {
         getBalance();
-        // console.log(axios.defaults.headers.common.Authorization )
-    });
+    }, 3000);
+    getBalance();
+})
 
+
+onMounted(() => {
+    getBalance();
+});
+
+onUnmounted(() => {
+    clearInterval(interval);
+})
 
 </script>
-
-<style scoped>
-    .container{
-       margin-top: 4px;
-       margin-right: 20px;
-    } 
-
-    .balance{
-        font-weight: 700;
-        font-size: 30px;
-        padding: 0;
-        margin: 0;
-        
-
-    }
-
-    span{
-        font-size: 15px;
-        font-weight: 200;
-    }
-
-</style>
-  
