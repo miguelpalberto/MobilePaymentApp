@@ -48,7 +48,7 @@
       <ion-row>
         <ion-col size="12"
           style="display:flex; flex-direction: column; justify-content: center; align-items: center; gap: 10px">
-          <ion-button v-if="isApplyButtonVisible" @click="applyChanges">Apply</ion-button>
+          <ion-button v-if="isApplyButtonVisible" :disabled="isAbleToApply" @click="applyChanges">Apply</ion-button>
           <ion-label style="color: red; font-size: 14px" v-if="errors && errors.piggy_bank_balance">
             {{ errors.piggy_bank_balance[0] }}
           </ion-label>
@@ -59,7 +59,7 @@
 </template>
   
 <script setup>
-import { ref, inject, computed, onMounted, onBeforeUnmount } from 'vue';
+import { ref, inject, computed, onMounted, onBeforeUnmount, watch } from 'vue';
 import { IonPage, IonModal, IonCard, IonCardContent, IonCardTitle, IonHeader, IonToolbar, IonContent, IonIcon, IonLabel, IonRow, IonCol, IonButton, IonTitle } from '@ionic/vue';
 import { arrowBackOutline, arrowForwardOutline } from 'ionicons/icons';
 import { setMask, removeMask, formatToNumber } from 'simple-mask-money'
@@ -83,6 +83,11 @@ const vCard = ref({
   piggy_bank_balance: null,
 })
 
+const isAbleToApply = computed(() => {
+  return errors.value.piggy_bank_balance
+})
+
+
 const formatter = new Intl.NumberFormat('pt', {
   style: 'decimal',
   minimumFractionDigits: 2,
@@ -95,7 +100,7 @@ const isApplyButtonVisible = computed(() => {
 const actualValue = computed(() => {
   return formatToNumber(inputValue.value)
 })
-const availableBalance = computed(() => vCard.value.balance - vCard.value.piggy_bank_balance)
+const availableBalance = computed(() => (vCard.value.balance - vCard.value.piggy_bank_balance).toFixed(2))
 const balanceFlowDirectionIcon = computed(() => isWithdrawingFromAvailableBalance.value ? arrowForwardOutline : arrowBackOutline)
 const balanceFormatted = computed(() => {
   const formattedNumber = formatter.format(vCard.value.balance);
@@ -108,6 +113,28 @@ const availableBalanceFormatted = computed(() => {
 const piggyBankBalanceFormatted = computed(() => {
   const formattedNumber = formatter.format(vCard.value.piggy_bank_balance);
   return `${formattedNumber} €`; // Add the Euro symbol to the right
+})
+
+watch(actualValue, (newValue) => {
+  if (newValue) {
+    if (isWithdrawingFromAvailableBalance.value) {
+      if (newValue > availableBalance.value) {
+        errors.value = {
+          piggy_bank_balance: ['Cannot store more money than the Total Balance in the Piggy Bank Vault']
+        }
+      } else {
+        errors.value = {}
+      }
+    } else {
+      if (newValue > vCard.value.piggy_bank_balance) {
+        errors.value = {
+          piggy_bank_balance: ['The amount being withdrawn is greater than the current Piggy Bank Vault balance']
+        }
+      } else {
+        errors.value = {}
+      }
+    }
+  }
 })
 
 
@@ -170,6 +197,7 @@ const applyChanges = async () => {
 
 const switchFlow = () => {
   isWithdrawingFromAvailableBalance.value = !isWithdrawingFromAvailableBalance.value
+  inputValue.value = null
 };
 
 const closeModal = () => {
