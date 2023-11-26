@@ -43,15 +43,12 @@
   const store = new Storage();
 
   onIonViewWillEnter(async () => {
+    await store.create();
 
-    router.push('/mycontacts');
-
-    // await store.create();
-
-    // const token = await store.get('token')
-    // if (token){
-    //   router.push('/dashboard');
-    // }
+    const token = await store.get('token')
+    if (token){
+      router.push('/dashboard');
+    }
 
   });
 

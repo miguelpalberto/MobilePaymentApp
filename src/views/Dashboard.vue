@@ -35,7 +35,7 @@
             </ion-row>
             <ion-row>
               <ion-col size="6">
-                <ion-button style="width:100%;" fill="clear">
+                <ion-button :router-link="sendMoneyUrl" style="width:100%;" fill="clear">
                   <ion-card>
                     <div class="ion-card-img-container">
                       <svg xmlns="http://www.w3.org/2000/svg" width="75" height="75" fill="currentColor"
@@ -112,6 +112,7 @@ import ModalPin from "../components/ModalPin.vue";
 import Balance from "../components/Balance.vue";
 import LastTransaction from "../components/LastTransaction.vue";
 import PiggyBankBalance from '../components/PiggyBankBalance.vue';
+import ContactList from "../components/ContactList.vue";
 
 import { useRoute } from 'vue-router';
 const route = useRoute();
@@ -133,22 +134,26 @@ const piggyBankUrl = computed(() => {
   return `/piggyBank/${phone.value}`;
 });
 
-onIonViewWillEnter(async () => {
-  // const store = new Storage();
-  // await store.create();
-  // const token = await store.get("token");
-  // if (!token) {
-  //   router.push("/login");
-  // } else {
-  //   axios.defaults.headers.common.Authorization = "Bearer " + token;
-  //   const phoneNumber = await store.get("phone_number");
-  //   console.log("phone number", phoneNumber);
+const sendMoneyUrl = computed(() => {
+  return '/mycontacts';
+});
 
-  //   if (phoneNumber) {
-  //     phone.value = phoneNumber;
-  //   }
-  //   loading.value = false;
-  // }
+onIonViewWillEnter(async () => {
+  const store = new Storage();
+  await store.create();
+  const token = await store.get("token");
+  if (!token) {
+    router.push("/login");
+  } else {
+    axios.defaults.headers.common.Authorization = "Bearer " + token;
+    const phoneNumber = await store.get("phone_number");
+    console.log("phone number", phoneNumber);
+
+    if (phoneNumber) {
+      phone.value = phoneNumber;
+    }
+    loading.value = false;
+  }
 });
 
 

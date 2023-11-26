@@ -13,12 +13,12 @@
                 <div v-if="contacts.length > 0">
                     <ion-list :inset="true">
                         <ion-item-sliding v-for="contact in contacts">
-                            <ion-item :button="true">
+                            <ion-item v-if="contact.name.display && contact.phones && contact.phones.length > 0" :button="true">
                                 <ion-avatar aria-hidden="true" slot="start">
                                     <img alt="" src="https://ionicframework.com/docs/img/demos/avatar.svg" />
                                 </ion-avatar>
                                 <ion-label>
-                                    <h1>{{ contact.name }}</h1>
+                                    <h1>{{ contact.name.display }}</h1>
                                     <p>{{ contact.phones[0].number }}</p>
                                 </ion-label>
                             </ion-item>
@@ -62,13 +62,14 @@ import
 } 
 from '@ionic/vue';
 import { pin, share, trash } from 'ionicons/icons';
+import { Capacitor } from '@capacitor/core';
 
 
 const isLoading = ref(true);
 const contacts = ref([]);
 
 const contact1 = {
-    name: 'Afonso Cancela',
+    name: { display: 'Afonso Cancela' },
     phones: [
         {
           type: PhoneType.Mobile,
@@ -79,7 +80,7 @@ const contact1 = {
 }
 
 const contact2 = {
-    name: 'João Tavares',
+    name: { display: 'João Tavares' },
     phones: [
         {
           type: PhoneType.Mobile,
@@ -90,7 +91,7 @@ const contact2 = {
 }
 
 const contact3 = {
-    name: 'Miguel',
+    name: { display: 'Miguel Pedrosa Alberto' },
     phones: [
         {
           type: PhoneType.Mobile,
@@ -101,7 +102,7 @@ const contact3 = {
 }
 
 const contact4 = {
-    name: 'João 2',
+    name: { display: 'João Miguel Antunes Carvalho da Silva' },
     phones: [
         {
           type: PhoneType.Mobile,
@@ -120,18 +121,18 @@ const retrieveListOfContacts = async () => {
     const result = await Contacts.getContacts({
         projection,
     });
-
+    
     return result.contacts
 }
 
-onMounted(() => {
-    if(isPlatform('mobileweb')){
-        console.log('web')
-        contacts.value = [contact1, contact2, contact3, contact4]
-        contacts.value = []
+onMounted(async () => {
+    if(Capacitor.isNativePlatform()){
+        contacts.value = await retrieveListOfContacts()
         isLoading.value = false;
     } else {
-        contacts.value = retrieveListOfContacts()
+        console.log('web')
+        contacts.value = [contact1, contact2, contact3, contact4]
+        isLoading.value = false;
     }
 })
 
