@@ -8,6 +8,17 @@
     <!-- Success Modal -->
     <ion-content :fullscreen="true">
       <br>
+      <ion-modal v-if="showSuccessModal" :is-open="showSuccessModal">
+        <ion-content class="ion-text-center">
+          <ion-card>
+            <ion-card-content>
+              <ion-card-title>Success</ion-card-title>
+              <p>Balances have been updated!</p>
+            </ion-card-content>
+          </ion-card>
+          <ion-button expand="full" color="success" @click="closeModal">Close</ion-button>
+        </ion-content>
+      </ion-modal>
       <ion-row>
         <ion-col size="12" style="display:flex; justify-content: center; align-items: center; gap: 5px">
           <b>Total Balance:</b>
@@ -49,7 +60,7 @@
   
 <script setup>
 import { ref, inject, computed, onMounted, onBeforeUnmount } from 'vue';
-import { IonPage, IonHeader, IonToolbar, IonContent, IonIcon, IonLabel, IonRow, IonCol, IonButton, IonTitle } from '@ionic/vue';
+import { IonPage, IonModal, IonCard, IonCardContent, IonCardTitle, IonHeader, IonToolbar, IonContent, IonIcon, IonLabel, IonRow, IonCol, IonButton, IonTitle } from '@ionic/vue';
 import { arrowBackOutline, arrowForwardOutline } from 'ionicons/icons';
 import { setMask, removeMask, formatToNumber } from 'simple-mask-money'
 
