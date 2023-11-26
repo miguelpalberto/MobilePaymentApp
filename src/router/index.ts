@@ -37,6 +37,10 @@ export default (axios) => {
       path: '/mydetails/:phone',
       props: (route) => ({ phone: route.params.phone }),
       component: () => import ('../components/UserDetails.vue')
+    },
+    {
+      path: '/mycontacts',
+      component: () => import ('../components/ContactList.vue')
     }
   ]
   
@@ -47,24 +51,24 @@ export default (axios) => {
   
   
   
-  router.beforeEach(async (to, from, next) => {
-    const store = new Storage();
-    await store.create();
-    const token = await store.get("token");
-    if (!token && to.path !== "/login") {
-      next({ path: '/login' });
-    } else {
-      to.params = {...to.params, token}
-      axios.defaults.headers.common.Authorization = "Bearer " + token;
-      const phoneNumber = await store.get("phone_number");
-      console.log("phone number", phoneNumber);
+  // router.beforeEach(async (to, from, next) => {
+  //   const store = new Storage();
+  //   await store.create();
+  //   const token = await store.get("token");
+  //   if (!token && to.path !== "/login") {
+  //     next({ path: '/login' });
+  //   } else {
+  //     to.params = {...to.params, token}
+  //     axios.defaults.headers.common.Authorization = "Bearer " + token;
+  //     const phoneNumber = await store.get("phone_number");
+  //     console.log("phone number", phoneNumber);
   
-      if (phoneNumber) {
-        to.params = {...to.params, phoneNumber}
-      }
-      next()
-    }
-  })
+  //     if (phoneNumber) {
+  //       to.params = {...to.params, phoneNumber}
+  //     }
+  //     next()
+  //   }
+  // })
   
 return router;  
   
