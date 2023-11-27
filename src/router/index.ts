@@ -37,6 +37,10 @@ export default (axios) => {
       path: '/mydetails/:phone',
       props: (route) => ({ phone: route.params.phone }),
       component: () => import ('../components/UserDetails.vue')
+    },
+    {
+      path: '/mycontacts',
+      component: () => import ('../components/ContactList.vue')
     }
   ]
   
