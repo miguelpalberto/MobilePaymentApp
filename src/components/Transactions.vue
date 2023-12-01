@@ -173,22 +173,5 @@ onMounted(() => {
 
 .custom-button-sorts {
   --background: rgb(54, 91, 148);
-  border-top-left-radius: 0; /* Remove top-left rounded corner */
-  border-bottom-left-radius: 0; 
-}
-
-.custom-button.date-button {
-  border-top-left-radius: 0; /* Remove top-left rounded corner */
-  border-bottom-left-radius: 0; /* Remove bottom-left rounded corner */
-}
-
-.euro-button {
-  border-radius: 0;
-  border-top-left-radius: 0; /* Remove top-left rounded corner */
-  border-bottom-left-radius: 0; /* Remove bottom-left rounded corner */
-}
-.arrow-button {
-  border-top-left-radius: 0; /* Remove top-left rounded corner */
-  border-bottom-left-radius: 0; /* Remove bottom-left rounded corner */
 }
 </style>
