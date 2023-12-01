@@ -11,7 +11,16 @@
       </div>
       <div v-else>
         <div v-if="transactionFilteredAndSorted.length > 0">
+           
           <div class="container">
+            <ion-button @click="openModal" expand="block" class="custom-class" color="primary" fill="solid">
+                Filters
+                <ion-badge color="danger" >1</ion-badge>
+              </ion-button>
+
+             <div>
+
+
             <ion-button class="custom-button-sorts date-button" :disabled="sortBy=='date'" size="" @click="sortByDate">
               <ion-icon :icon="calendarOutline"></ion-icon>
             </ion-button>
@@ -24,6 +33,7 @@
               <ion-icon :icon="caretDownOutline" v-if="ascDesc == 'asc'"></ion-icon>
               <ion-icon :icon="caretUpOutline" v-if="ascDesc == 'desc'"></ion-icon>
             </ion-button>
+            </div>
           </div>
           <ion-list>
             <ion-item v-for="transaction in transactionFilteredAndSorted">
@@ -74,10 +84,13 @@ import {
   IonItem,
   IonSpinner,
   IonButton,
+  modalController,
+  IonBadge
 } from "@ionic/vue";
 import { calendarOutline, logoEuro, caretDownOutline, caretUpOutline } from "ionicons/icons";
+import TransactionsFiter from './TransactionsFilter.vue'
 
-import { inject, ref, onMounted, computed } from "vue";
+import { inject, ref, onMounted, computed} from "vue";
 
 //import { Transaction } from '../components/Transaction.vue';
 
@@ -151,6 +164,20 @@ const transactionFilteredAndSorted = computed(()=>{
 });
 
 
+
+const openModal = async () => {
+    const modal = await modalController.create({
+      component: TransactionsFiter,
+    });
+
+    modal.present();
+
+    const { data, role } = await modal.onWillDismiss();
+
+  };
+
+
+
 onMounted(() => {
   axios
     .get(`vcards/${props.phone}/transactions`)
@@ -173,5 +200,19 @@ onMounted(() => {
 
 .custom-button-sorts {
   --background: rgb(54, 91, 148);
+}
+
+ion-badge {
+    position: absolute; 
+    font-size: 10pt;
+    right: -16px;
+    top: -13px; 
+
+}
+
+
+/* Setting Overflow Visible */
+ion-button.custom-class::part(native) {
+    overflow: visible;
 }
 </style>
