@@ -10,6 +10,16 @@
                 <ion-spinner></ion-spinner>
             </div>
             <div v-else>
+                <div>
+                    <ion-list :inset="true">
+                        <ion-item router-link="/dashboard" :button="true">
+                            <ion-icon color="success" slot="start" :icon="addCircleOutline" size="large"></ion-icon>
+                            <ion-label>
+                                <h1>New contact</h1>
+                            </ion-label>
+                        </ion-item>
+                    </ion-list>
+                </div>
                 <div v-if="contacts.length > 0">
                     <ion-list :inset="true">
                         <ion-item-sliding v-for="contact in contacts">
@@ -22,17 +32,6 @@
                                     <p>{{ contact.phones[0].number }}</p>
                                 </ion-label>
                             </ion-item>
-                            <ion-item-options slot="end">
-                                <ion-item-option color="warning">
-                                    <ion-icon slot="icon-only" :icon="pin"></ion-icon>
-                                </ion-item-option>
-                                <ion-item-option color="tertiary">
-                                    <ion-icon slot="icon-only" :icon="share"></ion-icon>
-                                </ion-item-option>
-                                <ion-item-option color="danger" expandable="true">
-                                    <ion-icon slot="icon-only" :icon="trash"></ion-icon>
-                                </ion-item-option>
-                            </ion-item-options>
                         </ion-item-sliding>
                     </ion-list>
                 </div>
@@ -55,13 +54,12 @@ import { ref, onMounted } from 'vue';
 import { Contacts, PhoneType } from '@capacitor-community/contacts';
 import 
 { 
-    IonPage, IonHeader, IonToolbar, IonContent, IonLabel, 
-    IonItemSliding, IonAvatar, IonIcon, IonItem, IonItemOptions, 
-    IonItemOption, IonList, IonTitle, IonSpinner, isPlatform, IonCard, 
+    IonPage, IonHeader, IonToolbar, IonContent, IonLabel, IonItemSliding, IonAvatar, 
+    IonIcon, IonItem, IonList, IonTitle, IonSpinner, IonCard,
     IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent
 } 
 from '@ionic/vue';
-import { pin, share, trash } from 'ionicons/icons';
+import { addCircleOutline } from 'ionicons/icons';
 import { Capacitor } from '@capacitor/core';
 
 
@@ -123,6 +121,23 @@ const retrieveListOfContacts = async () => {
     });
     
     return result.contacts
+}
+
+const addNewContact = async () => {
+    // const newContact = {
+    //     name: { display: 'Afonso Cancela' },
+    //     phones: [
+    //         {
+    //           type: PhoneType.Mobile,
+    //           label: 'mobile',
+    //           number: '918821097',
+    //         }
+    //     ]
+    // }
+
+    // const result = await Contacts.saveContact({
+    //     contact: newContact,
+    // });
 }
 
 onMounted(async () => {
