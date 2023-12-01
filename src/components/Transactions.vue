@@ -10,8 +10,8 @@
         <ion-spinner></ion-spinner>
       </div>
       <div v-else>
-        <div v-if="transactions.length > 0">
-          <div>
+        <div v-if="transactionFilteredAndSorted.length > 0">
+          <div class="container">
             <ion-button class="custom-button-sorts date-button" :disabled="sortBy=='date'" size="" @click="sortByDate">
               <ion-icon :icon="calendarOutline"></ion-icon>
             </ion-button>
@@ -20,12 +20,13 @@
               <ion-icon :icon="logoEuro"></ion-icon>
             </ion-button>
 
-            <ion-button class="custom-button-sorts arrow-button">
-              <ion-icon :icon="caretDownOutline"></ion-icon>
+            <ion-button class="custom-button-sorts arrow-button" @click="toogleAscDesc">
+              <ion-icon :icon="caretDownOutline" v-if="ascDesc == 'asc'"></ion-icon>
+              <ion-icon :icon="caretUpOutline" v-if="ascDesc == 'desc'"></ion-icon>
             </ion-button>
           </div>
           <ion-list>
-            <ion-item v-for="transaction in transactions">
+            <ion-item v-for="transaction in transactionFilteredAndSorted">
               <ion-label>
                 <ion-grid>
                   <ion-row>
@@ -74,7 +75,7 @@ import {
   IonSpinner,
   IonButton,
 } from "@ionic/vue";
-import { calendarOutline, logoEuro, caretDownOutline } from "ionicons/icons";
+import { calendarOutline, logoEuro, caretDownOutline, caretUpOutline } from "ionicons/icons";
 
 import { inject, ref, onMounted, computed } from "vue";
 
@@ -96,12 +97,56 @@ const sortBy = ref('value');
 const sortByDate = () => sortBy.value = 'date';
 const sortByValue = () => sortBy.value = 'value';
 
+const ascDesc = ref('asc');
+
+const toogleAscDesc = () => {
+  if (ascDesc.value == 'asc'){
+    ascDesc.value = 'desc';
+  }else{
+    ascDesc.value = 'asc';
+  }
+}
+
 
 const transactionFilteredAndSorted = computed(()=>{
-    if (sortBy == 'date'){
-        
-    }
+    if (sortBy.value == 'date'){
+        //create a copy of the array
+        let transactionsCopy = [...transactions.value];
 
+        //sort the array
+        transactionsCopy.sort((a,b)=>{
+          if (ascDesc.value == 'asc'){
+            return a.datetime > b.datetime ? 1 : -1;
+
+          }else{
+            return a.datetime < b.datetime ? 1 : -1;
+          }
+        });
+
+        //return the sorted array
+        return transactionsCopy;
+
+    }else if (sortBy.value == 'value'){
+        //create a copy of the array
+        let transactionsCopy = [...transactions.value];
+
+        //sort the array
+        transactionsCopy.sort((a,b)=>{
+            const valorSemEuro1 = parseFloat(a.value.replace('€', ''));
+            const valorSemEuro2 = parseFloat(b.value.replace('€', ''));
+
+            if (ascDesc.value == 'asc'){
+              return valorSemEuro1 < valorSemEuro2 ? 1 : -1;
+            }
+            else{
+              return valorSemEuro1 > valorSemEuro2 ? 1 : -1;
+            } 
+        });
+
+        //return the sorted array
+        return transactionsCopy;
+
+      }
 
 });
 
@@ -121,10 +166,15 @@ onMounted(() => {
 </script>
 
 <style>
+.container{
+  display: flex;
+  justify-content:flex-end;
+}
+
 .custom-button-sorts {
   --background: rgb(54, 91, 148);
   border-top-left-radius: 0; /* Remove top-left rounded corner */
-  border-bottom-left-radius: 0; /
+  border-bottom-left-radius: 0; 
 }
 
 .custom-button.date-button {
