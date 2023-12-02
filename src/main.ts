@@ -26,6 +26,7 @@ import './theme/variables.css';
 
 import './assets/css/main.css';
 
+
 import axios from 'axios';
 const serverBaseUrl = import.meta.env.VITE_SERVER_BASE_URL
 
@@ -45,8 +46,6 @@ const app = createApp(App)
   .use(router);
 
 app.provide('serverBaseUrl', serverBaseUrl)
-
-
 
 
 app.provide(

@@ -10,8 +10,18 @@
         <ion-spinner></ion-spinner>
       </div>
       <div v-else>
-        <div v-if="transactionFilteredAndSorted.length > 0">
+        <div>
+           
           <div class="container">
+            <div class="filters">
+            <ion-button class="custom-button-filters" @click="openModal" expand="block" fill="solid">
+                Filters
+                <ion-badge color="danger" >{{  filterByDate != null && filterByDate.startDate ? 1:''}}</ion-badge>
+              </ion-button>
+            </div>
+             <div class="sorts">
+
+
             <ion-button class="custom-button-sorts date-button" :disabled="sortBy=='date'" size="" @click="sortByDate">
               <ion-icon :icon="calendarOutline"></ion-icon>
             </ion-button>
@@ -24,8 +34,9 @@
               <ion-icon :icon="caretDownOutline" v-if="ascDesc == 'asc'"></ion-icon>
               <ion-icon :icon="caretUpOutline" v-if="ascDesc == 'desc'"></ion-icon>
             </ion-button>
+            </div>
           </div>
-          <ion-list>
+          <ion-list  v-if="transactionFilteredAndSorted.length > 0">
             <ion-item v-for="transaction in transactionFilteredAndSorted">
               <ion-label>
                 <ion-grid>
@@ -55,10 +66,11 @@
               </ion-label>
             </ion-item>
           </ion-list>
+          <div v-else>
+            <p>No transactions</p>
+          </div>
         </div>
-        <div v-else>
-          <p>No transactions</p>
-        </div>
+
       </div>
     </ion-content>
   </ion-page>
@@ -74,10 +86,13 @@ import {
   IonItem,
   IonSpinner,
   IonButton,
+  modalController,
+  IonBadge
 } from "@ionic/vue";
 import { calendarOutline, logoEuro, caretDownOutline, caretUpOutline } from "ionicons/icons";
+import TransactionsFiter from './TransactionsFilter.vue'
 
-import { inject, ref, onMounted, computed } from "vue";
+import { inject, ref, onMounted, computed} from "vue";
 
 //import { Transaction } from '../components/Transaction.vue';
 
@@ -99,6 +114,10 @@ const sortByValue = () => sortBy.value = 'value';
 
 const ascDesc = ref('asc');
 
+const filterByDate = ref(null);
+
+
+
 const toogleAscDesc = () => {
   if (ascDesc.value == 'asc'){
     ascDesc.value = 'desc';
@@ -107,48 +126,59 @@ const toogleAscDesc = () => {
   }
 }
 
+const transactionFilteredAndSorted = computed(() => {
+  // Primeiro, aplique o filtro de data se existir
+  let filteredTransactions = transactions.value;
+  if (filterByDate.value && filterByDate.value.startDate && filterByDate.value.endDate) {
+    filteredTransactions = filteredTransactions.filter(transaction => {
+      const transactionDate = new Date(transaction.datetime);
+      const startDate = new Date(filterByDate.value.startDate);
+      const endDate = new Date(filterByDate.value.endDate);
+      return transactionDate >= startDate && transactionDate <= endDate;
+    });
+  }
 
-const transactionFilteredAndSorted = computed(()=>{
-    if (sortBy.value == 'date'){
-        //create a copy of the array
-        let transactionsCopy = [...transactions.value];
+  // Agora aplique o filtro de ordenação
+  if (sortBy.value === 'date') {
+    // Ordenar por data
+    filteredTransactions.sort((a, b) => {
+      const dateA = new Date(a.datetime);
+      const dateB = new Date(b.datetime);
+      return ascDesc.value === 'asc' ? dateA - dateB : dateB - dateA;
+    });
+  } else if (sortBy.value === 'value') {
+    // Ordenar por valor
+    filteredTransactions.sort((a, b) => {
+      const valorA = parseFloat(a.value.replace('€', ''));
+      const valorB = parseFloat(b.value.replace('€', ''));
+      return ascDesc.value === 'asc' ? valorB - valorA : valorA - valorB;
+    });
+  }
 
-        //sort the array
-        transactionsCopy.sort((a,b)=>{
-          if (ascDesc.value == 'asc'){
-            return a.datetime > b.datetime ? 1 : -1;
-
-          }else{
-            return a.datetime < b.datetime ? 1 : -1;
-          }
-        });
-
-        //return the sorted array
-        return transactionsCopy;
-
-    }else if (sortBy.value == 'value'){
-        //create a copy of the array
-        let transactionsCopy = [...transactions.value];
-
-        //sort the array
-        transactionsCopy.sort((a,b)=>{
-            const valorSemEuro1 = parseFloat(a.value.replace('€', ''));
-            const valorSemEuro2 = parseFloat(b.value.replace('€', ''));
-
-            if (ascDesc.value == 'asc'){
-              return valorSemEuro1 < valorSemEuro2 ? 1 : -1;
-            }
-            else{
-              return valorSemEuro1 > valorSemEuro2 ? 1 : -1;
-            } 
-        });
-
-        //return the sorted array
-        return transactionsCopy;
-
-      }
-
+  // Retorna as transações filtradas e ordenadas
+  return filteredTransactions;
 });
+
+
+
+
+
+const openModal = async () => {
+    const modal = await modalController.create({
+      component: TransactionsFiter,
+      componentProps: {
+        filterByDate: filterByDate.value,
+      },
+    });
+
+    modal.present();
+
+    const { data, role } = await modal.onWillDismiss();
+
+    filterByDate.value = data;
+
+  };
+
 
 
 onMounted(() => {
@@ -163,15 +193,46 @@ onMounted(() => {
       console.log(error);
     });
 });
+// Listen for the custom event from TransactionsFilter component
+const handleFilterSelection = (data) => {
+  selectedFilters.value = data;
+  // Perform any additional actions based on the selected filters
+};
+
+
 </script>
 
 <style>
 .container{
   display: flex;
-  justify-content:flex-end;
 }
-
+.filters{
+    flex: 1;
+    justify-content:flex-start;
+    padding-right: 20px;
+    
+  }
+.sorts{
+    justify-content:flex-end;
+  }
+.custom-button-filters{ 
+    --background: rgb(54, 91, 148);
+  }
 .custom-button-sorts {
   --background: rgb(54, 91, 148);
+}
+
+ion-badge {
+    position: absolute; 
+    font-size: 10pt;
+    right: -16px;
+    top: -13px; 
+
+}
+
+
+/* Setting Overflow Visible */
+ion-button.custom-class::part(native) {
+    overflow: visible;
 }
 </style>
