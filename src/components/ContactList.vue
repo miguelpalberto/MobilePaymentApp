@@ -165,22 +165,6 @@ const getVCardContacts = async (contacts) => {
 }
 
 onMounted(async () => {
-    // if(Capacitor.isNativePlatform()){
-    //     contacts.value = await retrieveListOfContacts()
-    //     isLoading.value = false;
-    // } else {
-    //     console.log('web')
-    //     contacts.value = [contact1, contact2, contact3, contact4]
-    //     isLoading.value = false;
-    // }
-
-    // if(contacts.value.length > 0){
-    //     const phoneNumbers = contacts.value.map(contact => contact.phones[0].number)
-    //     phoneNumbers.forEach((phoneNumber, i) => {
-    //         phoneNumbers[i] = phoneNumber.replace(/\s/g, '')
-    //     })
-    //     console.log(phoneNumbers)
-    // }
     contacts.value = await getPhoneContacts()
     isLoading.value = false;
 })
