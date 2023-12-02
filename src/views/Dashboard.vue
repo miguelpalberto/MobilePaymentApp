@@ -114,6 +114,8 @@ import LastTransaction from "../components/LastTransaction.vue";
 import PiggyBankBalance from '../components/PiggyBankBalance.vue';
 import ContactList from "../components/ContactList.vue";
 
+const axios = inject("axios");
+
 import { useRoute } from 'vue-router';
 const route = useRoute();
 
