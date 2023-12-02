@@ -14,7 +14,6 @@
                 <ion-spinner style="width: 100px; height: 100px;"></ion-spinner>
             </div>
             <div v-else>
-
                 <div>
                     <ion-list :inset="true">
                         <ion-item @click="openAddContactModal" :button="true">
@@ -38,17 +37,6 @@
                                     <p>{{ contact.phones[0].number }}</p>
                                 </ion-label>
                             </ion-item>
-                            <ion-item-options slot="end">
-                                <ion-item-option color="warning">
-                                    <ion-icon slot="icon-only" :icon="pin"></ion-icon>
-                                </ion-item-option>
-                                <ion-item-option color="tertiary">
-                                    <ion-icon slot="icon-only" :icon="share"></ion-icon>
-                                </ion-item-option>
-                                <ion-item-option color="danger" expandable="true">
-                                    <ion-icon slot="icon-only" :icon="trash"></ion-icon>
-                                </ion-item-option>
-                            </ion-item-options>
                         </ion-item-sliding>
                     </ion-list>
                 </div>
@@ -69,14 +57,15 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { Contacts, PhoneType } from '@capacitor-community/contacts';
-import {
+import 
+{ 
     IonPage, IonHeader, IonToolbar, IonContent, IonLabel,
     IonItemSliding, IonAvatar, IonIcon, IonItem, IonItemOptions,
     IonItemOption, IonList, IonTitle, IonSpinner, isPlatform, IonCard,
     IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonBackButton, IonButtons,
     modalController
-}
-    from '@ionic/vue';
+} 
+from '@ionic/vue';
 import { pin, share, trash, addCircleOutline } from 'ionicons/icons';
 import { Capacitor } from '@capacitor/core';
 import AddContactModal from './AddContactModal.vue';
