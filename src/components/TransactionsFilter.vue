@@ -6,7 +6,7 @@
       </ion-buttons>
       <ion-title>Modal</ion-title>
       <ion-buttons slot="end">
-        <ion-button @click="confirm" :strong="true" :disabled="disableTimeButton">Confirm</ion-button>
+        <ion-button @click="confirm" :strong="true">Confirm</ion-button>
       </ion-buttons>
     </ion-toolbar>
   </ion-header>
@@ -14,7 +14,8 @@
     <div v-show="!showEndDate">
       <label>Start Date:</label>
       <input class="dateInput" v-model="selectedStartDate" @click="openStartDate" :disabled="showStartDate" />
-      <ion-datetime v-if="showStartDate" v-model="selectedStartDate"></ion-datetime>
+      <ion-datetime v-if="showStartDate" v-model="selectedStartDate" ></ion-datetime>
+
       <ion-button v-if="showStartDate" @click="saveStartDate">OK</ion-button>
     </div>
     <div v-show="!showStartDate">
@@ -28,7 +29,7 @@
 
 <script lang="ts" setup>
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonButton, IonItem, IonInput, modalController, IonDatetime } from '@ionic/vue';
-import { onMounted, ref, computed } from 'vue';
+import { onMounted, ref } from 'vue';
 
 const name = ref();
 const showStartDate = ref(false);
@@ -37,7 +38,7 @@ const selectedStartDate = ref('');
 const selectedEndDate = ref('');
 
 const cancel = () => modalController.dismiss(null, 'cancel');
-const confirm = () => modalController.dismiss({ start: selectedStartDate, end: selectedEndDate }, 'confirm');
+const confirm = () => modalController.dismiss({ startDate: selectedStartDate.value, endDate: selectedEndDate.value }, 'confirm');
 
 const openStartDate = () => {
   showEndDate.value = false;
@@ -50,9 +51,6 @@ const openEndDate = () => {
   showEndDate.value = true;
 };
 const saveEndDate = () => showEndDate.value = false;
-
-// Compute the disabled status of the Confirm button
-const disableTimeButton = computed(() => showStartDate.value || showEndDate.value);
 </script>
 
 <style scoped>
