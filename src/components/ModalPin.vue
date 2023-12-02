@@ -37,7 +37,7 @@
 
 </script>
 
-<style>
+<style scoped>
   ion-modal {
     --height: 50%;
     --width: 90%;
