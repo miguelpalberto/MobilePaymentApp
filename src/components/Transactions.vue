@@ -10,13 +10,13 @@
         <ion-spinner></ion-spinner>
       </div>
       <div v-else>
-        <div v-if="transactionFilteredAndSorted.length > 0">
+        <div>
            
           <div class="container">
             <div class="filters">
             <ion-button class="custom-button-filters" @click="openModal" expand="block" fill="solid">
                 Filters
-                <ion-badge color="danger" >2</ion-badge>
+                <ion-badge color="danger" >{{  filterByDate != null && filterByDate.startDate ? 1:''}}</ion-badge>
               </ion-button>
             </div>
              <div class="sorts">
@@ -36,7 +36,7 @@
             </ion-button>
             </div>
           </div>
-          <ion-list>
+          <ion-list  v-if="transactionFilteredAndSorted.length > 0">
             <ion-item v-for="transaction in transactionFilteredAndSorted">
               <ion-label>
                 <ion-grid>
@@ -66,10 +66,11 @@
               </ion-label>
             </ion-item>
           </ion-list>
+          <div v-else>
+            <p>No transactions</p>
+          </div>
         </div>
-        <div v-else>
-          <p>No transactions</p>
-        </div>
+
       </div>
     </ion-content>
   </ion-page>
@@ -165,6 +166,9 @@ const transactionFilteredAndSorted = computed(() => {
 const openModal = async () => {
     const modal = await modalController.create({
       component: TransactionsFiter,
+      componentProps: {
+        filterByDate: filterByDate.value,
+      },
     });
 
     modal.present();
