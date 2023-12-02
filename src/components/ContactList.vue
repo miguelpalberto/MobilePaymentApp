@@ -23,13 +23,15 @@
                 <div v-if="contacts.length > 0">
                     <ion-list :inset="true">
                         <ion-item-sliding v-for="contact in contacts">
-                            <ion-item v-if="contact.name.display && contact.phones && contact.phones.length > 0" :button="true">
+                            <ion-item v-if="contact.name && contact.name.length > 0 && contact.phone &&
+                             contact.phone.length > 0" :button="true">
+                                <ion-icon v-show="contact.isVcard" aria-hidden="true" :icon="cardOutline" color="medium" slot="end"></ion-icon>
                                 <ion-avatar aria-hidden="true" slot="start">
                                     <img alt="" src="https://ionicframework.com/docs/img/demos/avatar.svg" />
                                 </ion-avatar>
                                 <ion-label>
-                                    <h1>{{ contact.name.display }}</h1>
-                                    <p>{{ contact.phones[0].number }}</p>
+                                    <h1>{{ contact.name }}</h1>
+                                    <p>{{ contact.phone }}</p>
                                 </ion-label>
                             </ion-item>
                         </ion-item-sliding>
@@ -50,7 +52,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { inject, ref, onMounted } from 'vue';
 import { Contacts, PhoneType } from '@capacitor-community/contacts';
 import 
 { 
@@ -59,9 +61,10 @@ import
     IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent
 } 
 from '@ionic/vue';
-import { addCircleOutline } from 'ionicons/icons';
+import { addCircleOutline, cardOutline } from 'ionicons/icons';
 import { Capacitor } from '@capacitor/core';
 
+const axios = inject('axios');
 
 const isLoading = ref(true);
 const contacts = ref([]);
@@ -105,7 +108,7 @@ const contact4 = {
         {
           type: PhoneType.Mobile,
           label: 'mobile',
-          number: '900000003',
+          number: '900 000 003',
         }
     ]
 }
@@ -123,32 +126,63 @@ const retrieveListOfContacts = async () => {
     return result.contacts
 }
 
-const addNewContact = async () => {
-    // const newContact = {
-    //     name: { display: 'Afonso Cancela' },
-    //     phones: [
-    //         {
-    //           type: PhoneType.Mobile,
-    //           label: 'mobile',
-    //           number: '918821097',
-    //         }
-    //     ]
-    // }
+const getPhoneContacts = async () => {
+    let contacts = [];
+    if(Capacitor.isNativePlatform()){
+        contacts = await retrieveListOfContacts()
+    } else {
+        console.log('web')
+        contacts = [contact1, contact2, contact3, contact4]
+    }
 
-    // const result = await Contacts.saveContact({
-    //     contact: newContact,
-    // });
+    return formatPhoneContacts(contacts)
+}
+
+const formatPhoneContacts = async (contacts) => {
+    const plainPhoneNumbers = contacts.map(contact => contact.phones[0].number)
+    plainPhoneNumbers.forEach((phoneNumber, i) => {
+        plainPhoneNumbers[i] = phoneNumber.replace(/\s/g, '')
+    })
+
+    const vCardContacts = await getVCardContacts(plainPhoneNumbers)
+
+    const formattedContacts = contacts.map(contact => {
+        const formattedContact = {
+            name: contact.name.display ? contact.name.display : '',
+            phone: contact.phones[0].number ? contact.phones[0].number.replace(/\s/g, '') : '',
+            isVcard: vCardContacts.includes(contact.phones[0].number.replace(/\s/g, ''))
+        }
+        return formattedContact
+    })
+    return formattedContacts
+}
+
+const getVCardContacts = async (contacts) => {
+    const result = await axios.get('/vcards/contacts', {
+         params: { contacts: contacts }
+    })
+    return result.data.contacts
 }
 
 onMounted(async () => {
-    if(Capacitor.isNativePlatform()){
-        contacts.value = await retrieveListOfContacts()
-        isLoading.value = false;
-    } else {
-        console.log('web')
-        contacts.value = [contact1, contact2, contact3, contact4]
-        isLoading.value = false;
-    }
+    // if(Capacitor.isNativePlatform()){
+    //     contacts.value = await retrieveListOfContacts()
+    //     isLoading.value = false;
+    // } else {
+    //     console.log('web')
+    //     contacts.value = [contact1, contact2, contact3, contact4]
+    //     isLoading.value = false;
+    // }
+
+    // if(contacts.value.length > 0){
+    //     const phoneNumbers = contacts.value.map(contact => contact.phones[0].number)
+    //     phoneNumbers.forEach((phoneNumber, i) => {
+    //         phoneNumbers[i] = phoneNumber.replace(/\s/g, '')
+    //     })
+    //     console.log(phoneNumbers)
+    // }
+    contacts.value = await getPhoneContacts()
+    isLoading.value = false;
 })
 
 </script>
