@@ -16,7 +16,8 @@
             <div class="filters">
             <ion-button class="custom-button-filters" @click="openModal" expand="block" fill="solid">
                 Filters
-                <ion-badge color="danger" >{{  filterByDate != null && filterByDate.startDate ? 1:''}}</ion-badge>
+                <ion-badge color="danger" >{{  filterByDate != null && filterByDate.startDate ? '.':''}}</ion-badge>
+                <!-- <ion-badge class="ion-badgeB" color="danger" >{{  filterByType != null ? '2':''}}</ion-badge> -->
               </ion-button>
             </div>
              <div class="sorts">
@@ -89,7 +90,7 @@ import {
   modalController,
   IonBadge
 } from "@ionic/vue";
-import { calendarOutline, logoEuro, caretDownOutline, caretUpOutline } from "ionicons/icons";
+import { calendarOutline, logoEuro, caretDownOutline, caretUpOutline, filter } from "ionicons/icons";
 import TransactionsFiter from './TransactionsFilter.vue'
 
 import { inject, ref, onMounted, computed} from "vue";
@@ -116,6 +117,8 @@ const ascDesc = ref('asc');
 
 const filterByDate = ref(null);
 
+const filterByType = ref('All');
+
 
 
 const toogleAscDesc = () => {
@@ -135,6 +138,13 @@ const transactionFilteredAndSorted = computed(() => {
       const startDate = new Date(filterByDate.value.startDate);
       const endDate = new Date(filterByDate.value.endDate);
       return transactionDate >= startDate && transactionDate <= endDate;
+    });
+  }
+
+  // Agora aplique o filtro de tipo se existir
+  if (filterByType.value && filterByType.value !== 'All') {
+    filteredTransactions = filteredTransactions.filter(transaction => {
+      return transaction.type === filterByType.value;
     });
   }
 
@@ -168,6 +178,7 @@ const openModal = async () => {
       component: TransactionsFiter,
       componentProps: {
         filterByDate: filterByDate.value,
+        filterByType: filterByType.value,
       },
     });
 
@@ -175,7 +186,12 @@ const openModal = async () => {
 
     const { data, role } = await modal.onWillDismiss();
 
-    filterByDate.value = data;
+
+    console.log(data)
+    filterByDate.value = data?.filterByDate;
+    filterByType.value = data?.filterByType.selectedType;
+
+    console.log(filterByType.value)
 
   };
 
@@ -226,6 +242,14 @@ ion-badge {
     position: absolute; 
     font-size: 10pt;
     right: -16px;
+    top: -13px; 
+    color: #eb445a;
+
+}
+.ion-badgeB {
+    position: absolute; 
+    font-size: 10pt;
+    right: 8px;
     top: -13px; 
 
 }
