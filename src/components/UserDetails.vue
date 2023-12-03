@@ -2,6 +2,9 @@
   <ion-page>
     <ion-header>
       <ion-toolbar>
+        <ion-buttons slot="start">
+          <ion-back-button></ion-back-button>
+        </ion-buttons>
         <ion-title>User details</ion-title>
       </ion-toolbar>
     </ion-header>
@@ -95,7 +98,7 @@
   
 <script setup>
 import { ref, inject, onMounted } from 'vue';
-import { IonPage, IonContent, IonList, IonItem, IonInput, IonButton, IonAvatar, IonSpinner } from '@ionic/vue';
+import { IonPage, IonContent, IonList, IonItem, IonInput, IonButton, IonAvatar, IonSpinner, IonButtons, IonBackButton } from '@ionic/vue';
 import { useRouter } from 'vue-router'
 
 const axios = inject('axios');

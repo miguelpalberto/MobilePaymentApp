@@ -2,6 +2,9 @@
   <ion-page>
     <ion-header>
       <ion-toolbar>
+        <ion-buttons slot="start">
+          <ion-back-button></ion-back-button>
+        </ion-buttons>
         <ion-title>Transactions</ion-title>
       </ion-toolbar>
     </ion-header>
@@ -88,7 +91,9 @@ import {
   IonSpinner,
   IonButton,
   modalController,
-  IonBadge
+  IonBadge,
+  IonBackButton,
+  IonButtons
 } from "@ionic/vue";
 import { calendarOutline, logoEuro, caretDownOutline, caretUpOutline, filter } from "ionicons/icons";
 import TransactionsFiter from './TransactionsFilter.vue'
