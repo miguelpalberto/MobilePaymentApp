@@ -19,12 +19,10 @@
             <div class="filters">
             <ion-button class="custom-button-filters" @click="openModal" expand="block" fill="solid">
                 Filters
-                <ion-badge color="danger" >{{  filterByDate != null && filterByDate.startDate ? '.':''}}</ion-badge>
-                <!-- <ion-badge class="ion-badgeB" color="danger" >{{  filterByType != null ? '2':''}}</ion-badge> -->
+                <ion-badge color="danger" >{{  filterByDate != null && filterByDate.startDate ? '*':''}}</ion-badge><!-- <ion-badge class="ion-badgeB" color="danger" >{{  filterByType != null ? '2':''}}</ion-badge> -->
               </ion-button>
             </div>
              <div class="sorts">
-
 
             <ion-button class="custom-button-sorts date-button" :disabled="sortBy=='date'" size="" @click="sortByDate">
               <ion-icon :icon="calendarOutline"></ion-icon>
