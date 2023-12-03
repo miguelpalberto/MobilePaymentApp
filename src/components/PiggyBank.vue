@@ -2,6 +2,9 @@
   <ion-page>
     <ion-header>
       <ion-toolbar>
+        <ion-buttons slot="start">
+          <ion-back-button></ion-back-button>
+        </ion-buttons>
         <ion-title>Piggy Bank Vault</ion-title>
       </ion-toolbar>
     </ion-header>
@@ -60,7 +63,7 @@
   
 <script setup>
 import { ref, inject, computed, onMounted, onBeforeUnmount, watch } from 'vue';
-import { IonPage, IonModal, IonCard, IonCardContent, IonCardTitle, IonHeader, IonToolbar, IonContent, IonIcon, IonLabel, IonRow, IonCol, IonButton, IonTitle } from '@ionic/vue';
+import { IonPage, IonModal, IonCard, IonCardContent, IonCardTitle, IonHeader, IonToolbar, IonContent, IonIcon, IonLabel, IonRow, IonCol, IonButton, IonTitle, IonButtons, IonBackButton } from '@ionic/vue';
 import { arrowBackOutline, arrowForwardOutline } from 'ionicons/icons';
 import { setMask, removeMask, formatToNumber } from 'simple-mask-money'
 
