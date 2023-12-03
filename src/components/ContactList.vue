@@ -204,7 +204,6 @@ const openAddContactModal = async () => {
 }
 
 const formatPhoneContacts = async (contacts) => {
-    console.log(contacts)
     const plainPhoneNumbers = contacts.filter(contact => contact.phones).map(contact => contact.phones[0]?.number)
     plainPhoneNumbers.forEach((phoneNumber, i) => {
         plainPhoneNumbers[i] = phoneNumber.replace(/\s/g, '')
