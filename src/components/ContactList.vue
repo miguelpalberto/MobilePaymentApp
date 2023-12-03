@@ -2,20 +2,24 @@
     <ion-page>
         <ion-header>
             <ion-toolbar>
+                <ion-buttons slot="start">
+                    <ion-back-button></ion-back-button>
+                </ion-buttons>
                 <ion-title>Contacts</ion-title>
             </ion-toolbar>
         </ion-header>
         <ion-content>
-            <div v-if="isLoading">
-                <ion-spinner></ion-spinner>
+            <div v-if="isLoading" style="height: 100%; width: 100%; display:flex; align-items: center; 
+    justify-content: center;">
+                <ion-spinner style="width: 100px; height: 100px;"></ion-spinner>
             </div>
             <div v-else>
                 <div>
                     <ion-list :inset="true">
-                        <ion-item router-link="/dashboard" :button="true">
+                        <ion-item @click="openAddContactModal" :button="true">
                             <ion-icon color="success" slot="start" :icon="addCircleOutline" size="large"></ion-icon>
                             <ion-label>
-                                <h1>New contact</h1>
+                                <h1>Add New Contact</h1>
                             </ion-label>
                         </ion-item>
                     </ion-list>
@@ -56,13 +60,16 @@ import { inject, ref, onMounted } from 'vue';
 import { Contacts, PhoneType } from '@capacitor-community/contacts';
 import 
 { 
-    IonPage, IonHeader, IonToolbar, IonContent, IonLabel, IonItemSliding, IonAvatar, 
-    IonIcon, IonItem, IonList, IonTitle, IonSpinner, IonCard,
-    IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent
+    IonPage, IonHeader, IonToolbar, IonContent, IonLabel,
+    IonItemSliding, IonAvatar, IonIcon, IonItem, IonItemOptions,
+    IonItemOption, IonList, IonTitle, IonSpinner, isPlatform, IonCard,
+    IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonBackButton, IonButtons,
+    modalController
 } 
 from '@ionic/vue';
 import { addCircleOutline, cardOutline } from 'ionicons/icons';
 import { Capacitor } from '@capacitor/core';
+import AddContactModal from './AddContactModal.vue';
 
 const axios = inject('axios');
 
@@ -73,9 +80,9 @@ const contact1 = {
     name: { display: 'Afonso Cancela' },
     phones: [
         {
-          type: PhoneType.Mobile,
-          label: 'mobile',
-          number: '918821097',
+            type: PhoneType.Mobile,
+            label: 'mobile',
+            number: '918821097',
         }
     ]
 }
@@ -84,9 +91,9 @@ const contact2 = {
     name: { display: 'João Tavares' },
     phones: [
         {
-          type: PhoneType.Mobile,
-          label: 'mobile',
-          number: '900000001',
+            type: PhoneType.Mobile,
+            label: 'mobile',
+            number: '900000001',
         }
     ]
 }
@@ -95,9 +102,9 @@ const contact3 = {
     name: { display: 'Miguel Pedrosa Alberto' },
     phones: [
         {
-          type: PhoneType.Mobile,
-          label: 'mobile',
-          number: '900000002',
+            type: PhoneType.Mobile,
+            label: 'mobile',
+            number: '900000002',
         }
     ]
 }
@@ -122,7 +129,7 @@ const retrieveListOfContacts = async () => {
     const result = await Contacts.getContacts({
         projection,
     });
-    
+
     return result.contacts
 }
 
@@ -131,11 +138,45 @@ const getPhoneContacts = async () => {
     if(Capacitor.isNativePlatform()){
         contacts = await retrieveListOfContacts()
     } else {
+
         console.log('web')
         contacts = [contact1, contact2, contact3, contact4]
     }
+    return await formatPhoneContacts(contacts)
+}
 
-    return formatPhoneContacts(contacts)
+const openAddContactModal = async () => {
+    const modal = await modalController.create({
+        component: AddContactModal
+    });
+ 
+    modal.present();
+    const { data, role } = await modal.onWillDismiss();
+    if (role === 'add') {
+        if (data.saveContact) {
+            const newContact = {
+                name: { display: data.name, given: data.name, family: '' },
+                phones: [
+                    {
+                        type: PhoneType.Mobile,
+                        label: 'mobile',
+                        number: data.phoneNumber,
+                    }
+                ]
+            }
+ 
+            isLoading.value = true;
+            if (Capacitor.isNativePlatform()) {
+                await Contacts.createContact({ contact: newContact })
+            }
+
+            contacts.value.push(formatPhoneContact(newContact, true))
+
+            isLoading.value = false;
+        }
+ 
+        //send money
+    }
 }
 
 const formatPhoneContacts = async (contacts) => {
@@ -147,14 +188,17 @@ const formatPhoneContacts = async (contacts) => {
     const vCardContacts = await getVCardContacts(plainPhoneNumbers)
 
     const formattedContacts = contacts.map(contact => {
-        const formattedContact = {
-            name: contact.name.display ? contact.name.display : '',
-            phone: contact.phones[0].number ? contact.phones[0].number.replace(/\s/g, '') : '',
-            isVcard: vCardContacts.includes(contact.phones[0].number.replace(/\s/g, ''))
-        }
-        return formattedContact
+        return formatPhoneContact(contact, vCardContacts.includes(contact.phones[0].number.replace(/\s/g, '')))
     })
     return formattedContacts
+}
+
+const formatPhoneContact = (contact, isVcard = false) => {
+    return {
+        name: contact.name.display ? contact.name.display : '',
+        phone: contact.phones[0].number ? contact.phones[0].number.replace(/\s/g, '') : '',
+        isVcard: isVcard
+    }
 }
 
 const getVCardContacts = async (contacts) => {

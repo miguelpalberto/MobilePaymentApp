@@ -52,11 +52,6 @@ onMounted(() => {
     getBalance();
 })
 
-
-onMounted(() => {
-    getBalance();
-});
-
 onUnmounted(() => {
     clearInterval(interval);
 })
