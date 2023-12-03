@@ -202,7 +202,7 @@ const handleFilterSelection = (data) => {
 
 </script>
 
-<style>
+<style scoped>
 .container{
   display: flex;
 }
