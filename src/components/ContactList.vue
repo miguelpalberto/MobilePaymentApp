@@ -27,14 +27,15 @@
                 <div v-if="contacts.length > 0">
                     <ion-list :inset="true">
                         <ion-item-sliding v-for="contact in contacts">
-                            <ion-item v-if="contact.name.display && contact.phones && contact.phones.length > 0"
-                                :button="true">
+                            <ion-item v-if="contact.name && contact.name.length > 0 && contact.phone &&
+                             contact.phone.length > 0" :button="true">
+                                <ion-icon v-show="contact.isVcard" aria-hidden="true" :icon="cardOutline" color="medium" slot="end"></ion-icon>
                                 <ion-avatar aria-hidden="true" slot="start">
                                     <img alt="" src="https://ionicframework.com/docs/img/demos/avatar.svg" />
                                 </ion-avatar>
                                 <ion-label>
-                                    <h1>{{ contact.name.display }}</h1>
-                                    <p>{{ contact.phones[0].number }}</p>
+                                    <h1>{{ contact.name }}</h1>
+                                    <p>{{ contact.phone }}</p>
                                 </ion-label>
                             </ion-item>
                         </ion-item-sliding>
@@ -55,7 +56,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { inject, ref, onMounted } from 'vue';
 import { Contacts, PhoneType } from '@capacitor-community/contacts';
 import 
 { 
@@ -66,9 +67,12 @@ import
     modalController
 } 
 from '@ionic/vue';
-import { pin, share, trash, addCircleOutline } from 'ionicons/icons';
+import { addCircleOutline, cardOutline } from 'ionicons/icons';
 import { Capacitor } from '@capacitor/core';
 import AddContactModal from './AddContactModal.vue';
+
+const axios = inject('axios');
+
 const isLoading = ref(true);
 const contacts = ref([]);
 
@@ -109,9 +113,9 @@ const contact4 = {
     name: { display: 'João Miguel Antunes Carvalho da Silva' },
     phones: [
         {
-            type: PhoneType.Mobile,
-            label: 'mobile',
-            number: '900000003',
+          type: PhoneType.Mobile,
+          label: 'mobile',
+          number: '900 000 003',
         }
     ]
 }
@@ -129,11 +133,23 @@ const retrieveListOfContacts = async () => {
     return result.contacts
 }
 
+const getPhoneContacts = async () => {
+    let contacts = [];
+    if(Capacitor.isNativePlatform()){
+        contacts = await retrieveListOfContacts()
+    } else {
+
+        console.log('web')
+        contacts = [contact1, contact2, contact3, contact4]
+    }
+    return await formatPhoneContacts(contacts)
+}
+
 const openAddContactModal = async () => {
     const modal = await modalController.create({
         component: AddContactModal
     });
-
+ 
     modal.present();
     const { data, role } = await modal.onWillDismiss();
     if (role === 'add') {
@@ -148,31 +164,53 @@ const openAddContactModal = async () => {
                     }
                 ]
             }
-
+ 
             isLoading.value = true;
             if (Capacitor.isNativePlatform()) {
-                await Contacts.createContact({ contact: newContact });
-                contacts.value = await retrieveListOfContacts()
+                await Contacts.createContact({ contact: newContact })
             }
-            else {
-                contacts.value.push(newContact);
-            }
+
+            contacts.value.push(formatPhoneContact(newContact, true))
+
             isLoading.value = false;
         }
-
+ 
         //send money
     }
-};
+}
+
+const formatPhoneContacts = async (contacts) => {
+    const plainPhoneNumbers = contacts.map(contact => contact.phones[0].number)
+    plainPhoneNumbers.forEach((phoneNumber, i) => {
+        plainPhoneNumbers[i] = phoneNumber.replace(/\s/g, '')
+    })
+
+    const vCardContacts = await getVCardContacts(plainPhoneNumbers)
+
+    const formattedContacts = contacts.map(contact => {
+        return formatPhoneContact(contact, vCardContacts.includes(contact.phones[0].number.replace(/\s/g, '')))
+    })
+    return formattedContacts
+}
+
+const formatPhoneContact = (contact, isVcard = false) => {
+    return {
+        name: contact.name.display ? contact.name.display : '',
+        phone: contact.phones[0].number ? contact.phones[0].number.replace(/\s/g, '') : '',
+        isVcard: isVcard
+    }
+}
+
+const getVCardContacts = async (contacts) => {
+    const result = await axios.get('/vcards/contacts', {
+         params: { contacts: contacts }
+    })
+    return result.data.contacts
+}
 
 onMounted(async () => {
-    if (Capacitor.isNativePlatform()) {
-        contacts.value = await retrieveListOfContacts()
-        isLoading.value = false;
-    } else {
-        console.log('web')
-        contacts.value = [contact1, contact2, contact3, contact4]
-        isLoading.value = false;
-    }
+    contacts.value = await getPhoneContacts()
+    isLoading.value = false;
 })
 
 </script>
