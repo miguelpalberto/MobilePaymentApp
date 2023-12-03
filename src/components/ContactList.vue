@@ -204,15 +204,15 @@ const openAddContactModal = async () => {
 }
 
 const formatPhoneContacts = async (contacts) => {
-    const plainPhoneNumbers = contacts.map(contact => contact.phones[0].number)
+    const plainPhoneNumbers = contacts.filter(contact => contact.phones).map(contact => contact.phones[0]?.number)
     plainPhoneNumbers.forEach((phoneNumber, i) => {
         plainPhoneNumbers[i] = phoneNumber.replace(/\s/g, '')
     })
 
     const vCardContacts = await getVCardContacts(plainPhoneNumbers)
 
-    const formattedContacts = contacts.map(contact => {
-        return formatPhoneContact(contact, vCardContacts.includes(contact.phones[0].number.replace(/\s/g, '')))
+    const formattedContacts = contacts.filter(contact => contact.phones).map(contact => {
+        return formatPhoneContact(contact, vCardContacts.includes(contact.phones[0]?.number.replace(/\s/g, '')))
     })
     return formattedContacts
 }
