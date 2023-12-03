@@ -28,8 +28,10 @@
                     <ion-list :inset="true">
                         <ion-item-sliding v-for="contact in contacts">
                             <ion-item v-if="contact.name && contact.name.length > 0 && contact.phone &&
-                             contact.phone.length > 0" :button="true">
-                                <ion-icon v-show="contact.isVcard" aria-hidden="true" :icon="cardOutline" color="medium" slot="end"></ion-icon>
+                                contact.phone.length > 0" :button="true" :disabled="!contact.isVcard"
+                                @click="sendMoney(contact)">
+                                <ion-icon v-show="contact.isVcard" aria-hidden="true" :icon="cardOutline" color="medium"
+                                    slot="end"></ion-icon>
                                 <ion-avatar aria-hidden="true" slot="start">
                                     <img alt="" src="https://ionicframework.com/docs/img/demos/avatar.svg" />
                                 </ion-avatar>
@@ -58,19 +60,20 @@
 <script setup>
 import { inject, ref, onMounted } from 'vue';
 import { Contacts, PhoneType } from '@capacitor-community/contacts';
-import 
-{ 
-    IonPage, IonHeader, IonToolbar, IonContent, IonLabel,
-    IonItemSliding, IonAvatar, IonIcon, IonItem, IonItemOptions,
-    IonItemOption, IonList, IonTitle, IonSpinner, isPlatform, IonCard,
-    IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonBackButton, IonButtons,
-    modalController
-} 
-from '@ionic/vue';
+import {
+IonPage, IonHeader, IonToolbar, IonContent, IonLabel,
+IonItemSliding, IonAvatar, IonIcon, IonItem, IonItemOptions,
+IonItemOption, IonList, IonTitle, IonSpinner, isPlatform, IonCard,
+IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonBackButton, IonButtons,
+modalController
+}
+    from '@ionic/vue';
 import { addCircleOutline, cardOutline } from 'ionicons/icons';
 import { Capacitor } from '@capacitor/core';
 import AddContactModal from './AddContactModal.vue';
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 const axios = inject('axios');
 
 const isLoading = ref(true);
@@ -113,9 +116,9 @@ const contact4 = {
     name: { display: 'João Miguel Antunes Carvalho da Silva' },
     phones: [
         {
-          type: PhoneType.Mobile,
-          label: 'mobile',
-          number: '900 000 003',
+            type: PhoneType.Mobile,
+            label: 'mobile',
+            number: '900 000 003',
         }
     ]
 }
@@ -135,7 +138,7 @@ const retrieveListOfContacts = async () => {
 
 const getPhoneContacts = async () => {
     let contacts = [];
-    if(Capacitor.isNativePlatform()){
+    if (Capacitor.isNativePlatform()) {
         contacts = await retrieveListOfContacts()
     } else {
 
@@ -145,13 +148,35 @@ const getPhoneContacts = async () => {
     return await formatPhoneContacts(contacts)
 }
 
+const sendMoney = (contact) => {
+    console.log(contact)
+    router.push({
+        path: `/sendMoney/${contact.phone}`,
+        query: {
+            name: contact.name,
+        }
+    })
+}
+
 const openAddContactModal = async () => {
     const modal = await modalController.create({
         component: AddContactModal
     });
- 
+
     modal.present();
     const { data, role } = await modal.onWillDismiss();
+    const newContact = {
+        name: { display: data.name, given: data.name, family: '' },
+        phones: [
+            {
+                type: PhoneType.Mobile,
+                label: 'mobile',
+                number: data.phoneNumber,
+            }
+        ]
+    }
+
+    const formattedContact = formatPhoneContact(newContact, true)
     if (role === 'add') {
         if (data.saveContact) {
             const newContact = {
@@ -164,19 +189,18 @@ const openAddContactModal = async () => {
                     }
                 ]
             }
- 
+
             isLoading.value = true;
             if (Capacitor.isNativePlatform()) {
                 await Contacts.createContact({ contact: newContact })
             }
 
-            contacts.value.push(formatPhoneContact(newContact, true))
-
+            contacts.value.push(formattedContact)
             isLoading.value = false;
         }
- 
-        //send money
     }
+
+    sendMoney(formattedContact)
 }
 
 const formatPhoneContacts = async (contacts) => {
@@ -203,7 +227,7 @@ const formatPhoneContact = (contact, isVcard = false) => {
 
 const getVCardContacts = async (contacts) => {
     const result = await axios.get('/vcards/contacts', {
-         params: { contacts: contacts }
+        params: { contacts: contacts }
     })
     return result.data.contacts
 }

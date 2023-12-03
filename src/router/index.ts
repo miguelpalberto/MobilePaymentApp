@@ -41,7 +41,13 @@ export default (axios) => {
     {
       path: '/mycontacts',
       component: () => import ('../components/ContactList.vue')
-    }
+    },
+    {
+      path: '/sendMoney/:pairPhone',
+      name: 'sendMoney',
+      component: () => import ('../components/SendMoney.vue'),
+      props: (route) => ({ pairPhone: route.params.pairPhone })
+    },
   ]
   
   const router = createRouter({
