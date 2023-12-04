@@ -14,6 +14,9 @@
           <ion-spinner></ion-spinner>
         </div>
         <div v-else>
+          <ion-refresher slot="fixed" :pull-factor="0.5" :pull-min="100" :pull-max="200" @ionRefresh="handleRefresh($event)">
+            <ion-refresher-content></ion-refresher-content>
+          </ion-refresher>
           <ion-grid>
             <ion-row>
               <ion-col size="12">
@@ -27,10 +30,10 @@
             </ion-row>
             <ion-row>
               <ion-col size="6">
-                <Balance :phone="phone"></Balance>
+                <Balance :phone="phone" :balance="balance"></Balance>
               </ion-col>
               <ion-col size="6">
-                <PiggyBankBalance :phone="phone"></PiggyBankBalance>
+                <PiggyBankBalance :phone="phone" :piggyBankBalance="piggyBankBalance"></PiggyBankBalance>
               </ion-col>
             </ion-row>
             <ion-row>
@@ -86,7 +89,7 @@
 </template>
 
 <script setup>
-import { ref, inject, onBeforeMount, computed } from "vue";
+import { ref, inject, onBeforeMount, computed, onMounted } from "vue";
 import {
   IonButtons,
   IonButton,
@@ -103,7 +106,9 @@ import {
   IonCol,
   IonCard,
   IonCardHeader,
-  IonCardTitle
+  IonCardTitle,
+  IonRefresher,
+  IonRefresherContent,
 } from "@ionic/vue";
 import { Storage } from "@ionic/storage";
 import { useRouter } from "vue-router";
@@ -122,8 +127,9 @@ const route = useRoute();
 const phone = ref(route.params.phoneNumber);
 const loading = ref(false);
 const pinCorrect = ref(false);
+const balance = ref(null);
+const piggyBankBalance = ref(null);
 
-const router = useRouter();
 
 const transactionUrl = computed(() => {
   return `/transactions/${phone.value}`;
@@ -140,23 +146,16 @@ const sendMoneyUrl = computed(() => {
   return '/mycontacts';
 });
 
-onIonViewWillEnter(async () => {
-  const store = new Storage();
-  await store.create();
-  const token = await store.get("token");
-  if (!token) {
-    router.push("/login");
-  } else {
-    axios.defaults.headers.common.Authorization = "Bearer " + token;
-    const phoneNumber = await store.get("phone_number");
-    console.log("phone number", phoneNumber);
+const getBalance = async() => {
+    const response = await axios.get(`/vcard/${phone.value}`)
+    balance.value = response.data.data.balance;
+}
 
-    if (phoneNumber) {
-      phone.value = phoneNumber;
-    }
-    loading.value = false;
-  }
-});
+const getPiggyBankBalance = async() => {
+    const response = await axios.get(`/vcard/${phone.value}`)
+    piggyBankBalance.value = response.data.data.piggy_bank_balance;
+}
+
 
 
 const checkPin = async (pin) => {
@@ -168,6 +167,18 @@ const checkPin = async (pin) => {
     console.log("pin correct");
   }
 };
+
+
+const handleRefresh = async(event) => {
+  await getBalance();
+  await getPiggyBankBalance();
+  event.target.complete();
+};
+
+onMounted(() => {
+  getBalance();
+  getPiggyBankBalance();
+})
 </script>
 
 <style scoped>
