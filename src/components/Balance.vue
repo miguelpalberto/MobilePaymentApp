@@ -16,13 +16,16 @@ const props = defineProps({
     phone: {
         type: String,
         required: true
+    },
+    balance: {
+        type: Number,
+        required: true
     }
 });
 
-const balance = ref('');
 const balanceFormatted = computed(() => {
 
-    if (balance.value == 0) {
+    if (props.balance == 0) {
         //escrever que nao tem saldo
         return 'No funds';
     }
@@ -33,27 +36,21 @@ const balanceFormatted = computed(() => {
         maximumFractionDigits: 2
     });
 
-    const formattedNumber = formatter.format(balance.value);
+    const formattedNumber = formatter.format(props.balance);
     return `${formattedNumber} €`; // Add the Euro symbol to the right
 });
 
-const getBalance = () => {
-    axios.get(`/vcard/${props.phone}`).then((response) => {
-        console.log(response.data.data.balance);
-        balance.value = response.data.data.balance;
-    })
-}
 
-let interval = null;
-onMounted(() => {
-    interval = setInterval(() => {
-        getBalance();
-    }, 3000);
-    getBalance();
-})
+// let interval = null;
+// onMounted(() => {
+//     interval = setInterval(() => {
+//         getBalance();
+//     }, 3000);
+//     getBalance();
+// })
 
-onUnmounted(() => {
-    clearInterval(interval);
-})
+// onUnmounted(() => {
+//     clearInterval(interval);
+// })
 
 </script>
