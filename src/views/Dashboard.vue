@@ -170,8 +170,12 @@ const checkPin = async (pin) => {
 
 
 const handleRefresh = async(event) => {
-  await getBalance();
-  await getPiggyBankBalance();
+  try{
+    await getBalance();
+    await getPiggyBankBalance();
+  }catch(error){
+    console.log(error);
+  }
   event.target.complete();
 };
 
