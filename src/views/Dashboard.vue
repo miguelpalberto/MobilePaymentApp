@@ -183,6 +183,12 @@ onMounted(() => {
   getBalance();
   getPiggyBankBalance();
 })
+
+onIonViewWillEnter(()=>{
+  getBalance();
+  getPiggyBankBalance();
+})
+
 </script>
 
 <style scoped>
