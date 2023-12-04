@@ -29,7 +29,7 @@
             </ion-grid>
             <ion-row class="ion-justify-content-center" style="align-self: self-end;">
                 <ion-card>
-                    <ion-card-content style="display:flex; flex-direction: column; align-items: center;">
+                    <ion-card-content style="display:flex; flex-direction: column; align-items: center; width:100%;">
                         <ion-checkbox :disabled="!isInputValid || isLoading" v-model="addContactRequest.saveContact">Save
                             contact in
                             my
