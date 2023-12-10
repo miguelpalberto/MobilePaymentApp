@@ -111,10 +111,10 @@ const axios = inject("axios");
 const isLoading = ref(true);
 const transactions = ref([]);
 
-const sortBy = ref('value');
+const sortBy = ref('date');
 
-const sortByDate = () => sortBy.value = 'date';
 const sortByValue = () => sortBy.value = 'value';
+const sortByDate = () => sortBy.value = 'date';
 
 const ascDesc = ref('asc');
 

@@ -17,17 +17,27 @@
                             <div class="w-100">
                                 <ion-card>
                                     <ion-card-content>
+                                        <br>
+                                        <br>
                                         <ion-icon :icon="paperPlaneOutline" style="font-size:64px; color: black"></ion-icon>
-                                        <p>Sending {{ inputValue }} to {{ name }} ({{ pairPhone }})</p>
+                                        <br>
+                                        <br>
+                                        <br>
+                                        <p style="font-size: 18px; color: black;">Sending {{ inputValue }} </p>
+                                        <p style="font-size: 18px; color: black;">to {{ name }} ({{ pairPhone }})</p>
+                                        <br>
+                                        <br>
                                     </ion-card-content>
                                 </ion-card>
                             </div>
                             <div class="w-100" style="display:flex; flex-direction: column; justify-content: center;">
                                 <label for="inputCode">Confirmation Code</label>
+                                <br>
                                 <input id="inputCode" type="password" placeholder="Enter your Confirmation Code"
                                     maxlength="3" @input="validateConfirmationCode"
                                     v-model="sendMoneyRequest.confirmation_code"
                                     style="text-align: center; font-size:20px; width: 100%" :disabled="isLoading" />
+                                    <br>
                                 <ion-text v-if="errors && errors.confirmation_code" color="danger">
                                     {{ errors.confirmation_code[0] }}
                                 </ion-text>
@@ -43,9 +53,17 @@
                             <div class="w-100">
                                 <ion-card>
                                     <ion-card-content>
+                                        <br>
+                                        <br>
                                         <ion-icon :icon="paperPlaneOutline" style="font-size:64px; color: green"></ion-icon>
-                                        <p>Transaction Successful!</p>
-                                        <p>Sent {{ inputValue }} to {{ name }} ({{ pairPhone }})</p>
+                                        <br>
+                                        <br>
+                                        <p style="font-size: 17px; color: black;">Transaction Successful!</p>
+                                        <br>
+                                        <p>{{ inputValue }} sent to {{ name }} ({{ pairPhone }})</p>
+                                        <br>
+                                        <p> {{ decimasSupostasTrue.toFixed(2) }}€ saved to your Piggy Bank Vault</p>
+                                        <br>
                                     </ion-card-content>
                                 </ion-card>
                             </div>
