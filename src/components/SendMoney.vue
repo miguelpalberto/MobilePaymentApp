@@ -61,8 +61,8 @@
                                         <p style="font-size: 17px; color: black;">Transaction Successful!</p>
                                         <br>
                                         <p>{{ inputValue }} sent to {{ name }} ({{ pairPhone }})</p>
-                                        <br>
-                                        <p> {{ decimasSupostasTrue.toFixed(2) }}€ saved to your Piggy Bank Vault</p>
+                                            <br>
+                                            <p v-if="route.params.autosavings"> {{ decimasSupostasTrue.toFixed(2) }}€ saved to your Piggy Bank Vault</p>
                                         <br>
                                     </ion-card-content>
                                 </ion-card>
@@ -172,7 +172,7 @@ import {
     IonPage, IonHeader, IonToolbar, IonTitle, IonContent,
     IonButtons, IonBackButton, IonGrid, IonRow, IonCol,
     IonCard, IonCardContent, IonCheckbox, IonButton, IonText,
-    IonSpinner, IonLabel, IonInput, IonModal, IonIcon
+    IonSpinner, IonLabel, IonInput, IonModal, IonIcon, onIonViewWillEnter
 } from '@ionic/vue';
 import { setMask, removeMask, formatToNumber } from 'simple-mask-money'
 import { paperPlaneOutline } from 'ionicons/icons';
@@ -193,11 +193,13 @@ const createRequest = () => {
         value: 0,
         pair_vcard: props.pairPhone,
         confirmation_code: '',
-        autoSave: false
+        autoSave: route.params.autosavings
     }
 }
 
+const autoSavings = ref(route.params.autosavings);
 const sendMoneyRequest = ref(createRequest())
+
 
 const vCard = ref(null)
 const errors = ref({
@@ -214,6 +216,14 @@ const isRequestSuccessful = ref(false)
 const isTransactionSuccessful = computed(() => {
     return isRequestSuccessful.value && !errors.value.confirmation_code.length
 })
+
+onIonViewWillEnter(async () => {
+    await store.create();
+    const autosavings = await store.get('autosavings');
+    if (autosavings){
+      autoSavings.value = autosavings;
+    }
+  });
 
 const name = computed(() => {
     return route.query.name ?? props.pairPhone
@@ -272,28 +282,24 @@ const createTransactionConfirmed = () => {
         isRequestSuccessful.value = true;
         isLoading.value = false;
 
-        // Auto-saving logic
-        const totalBalance = response.data.new_balance;
-        const transactionValue = sendMoneyRequest.value.value;
+        if(autoSavings.value){
+            // Auto-saving logic
+            const totalBalance = response.data.new_balance;
+            const transactionValue = sendMoneyRequest.value.value;
+            //if(autoSavings.value){
+            const centimos = transactionValue - Math.floor(transactionValue);
 
-        const centimos = transactionValue - Math.floor(transactionValue);
-        // Calculate the amount left until the next integer
-        let decimasSupostas = 1 - centimos;
-        // Round if necessary
-        decimasSupostas = Math.round(decimasSupostas * 100) / 100;
-        if (totalBalance >= decimasSupostas) {
-            // Update the local vCard data (assuming vCard is reactive)
-            vCard.value.balance = vCard.value.balance - decimasSupostas;
-            vCard.value.piggy_bank_balance = vCard.value.piggy_bank_balance + decimasSupostas;
-            decimasSupostasTrue.value = decimasSupostas;
-            // Save the changes to the server if needed
-            // axios.put(`/vcard/${route.params.phoneNumber}`, {
-            //     balance: vCard.value.balance,
-            //     piggy_bank_balance: vCard.value.piggy_bank_balance,
-            // });
+            let decimasSupostas = 1 - centimos;
+            // Round if necessary
+            decimasSupostas = Math.round(decimasSupostas * 100) / 100;
+            if (totalBalance >= decimasSupostas) {
+                vCard.value.balance = vCard.value.balance - decimasSupostas;
+                vCard.value.piggy_bank_balance = vCard.value.piggy_bank_balance + decimasSupostas;
+                decimasSupostasTrue.value = decimasSupostas;
+            }
         }
     }).catch((error) => {
-        console.log("catch lol: ");
+        console.log("catch");
         isLoading.value = false;
         errors.value = error.response.data.errors;
     });
