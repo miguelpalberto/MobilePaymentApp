@@ -95,6 +95,7 @@
               await store.set('phone_number', telemovel.value);
               await store.set('pin', pin.value);
               await store.set('autosavings', true);
+              await store.set('togglenotifications', true);
               router.push('/dashboard');
             } catch (error){
               console.log(error);

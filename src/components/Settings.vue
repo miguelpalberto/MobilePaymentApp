@@ -48,13 +48,17 @@ const props = defineProps({
 });
 
 const autoSavings = ref(route.params.autosavings);
-const notifications = ref(getSavedState("notifications", true));
+const notifications = ref(route.params.togglenotifications);
 
 onIonViewWillEnter(async () => {
     await store.create();
     const autosavings = await store.get('autosavings');
     if (autosavings){
       autoSavings.value = autosavings;
+    }
+    const togglenotifications = await store.get('togglenotifications');
+    if (togglenotifications){
+        notifications.value = togglenotifications;
     }
   });
 
@@ -65,19 +69,12 @@ const saveAutoSavings = async () => {
    
 }
 
-function toggleNotifications() {
-  notifications.value = !notifications.value;
-  saveState("notifications", notifications.value);
+const toggleNotifications = async () => {
+    notifications.value = !notifications.value;
+    await store.set('togglenotifications', notifications.value);
 }
 
-function getSavedState(key, defaultValue) {
-  const savedState = localStorage.getItem(key);
-  return savedState !== null ? JSON.parse(savedState) : defaultValue;
-}
 
-function saveState(key, value) {
-  localStorage.setItem(key, JSON.stringify(value));
-}
 
 onMounted(() => {
   // You can perform additional setup when the component is mounted.
