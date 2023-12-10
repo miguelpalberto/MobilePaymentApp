@@ -1,12 +1,14 @@
 <template>
   <ion-page>
     <ion-header>
-      <ion-toolbar>
-        <ion-buttons slot="start">
-          <ion-back-button></ion-back-button>
-        </ion-buttons>
-        <ion-title>User details</ion-title>
-      </ion-toolbar>
+      <ion-header>
+        <ion-toolbar>
+          <ion-buttons slot="start">
+            <ion-back-button></ion-back-button>
+          </ion-buttons>
+          <ion-title>User Details</ion-title>
+        </ion-toolbar>
+      </ion-header>
     </ion-header>
     <ion-content :fullscreen="true" class="ion-padding">
 
@@ -58,7 +60,9 @@
         </ion-list>
         <br>
         <br>
-        <ion-button expand="block" :color="isEditing ? 'secondary' : 'primary'" @click="toggleEditMode"> {{ isEditing ? 'Save' : 'Edit' }}</ion-button>
+        <ion-button expand="block" :color="isEditing ? 'secondary' : 'primary'" @click="toggleEditMode"> {{ isEditing ?
+          'Save' : 'Edit' }}</ion-button>
+        <ion-button expand="block" color="danger" @click="dismissVCard" :disabled="isEditing"> Dismiss </ion-button>
         <!-- <ion-button expand="block" @click="toggleEditMode">{{ isEditing ? 'Save' : 'Change Password and PIN' }}</ion-button> -->
 
       </div>
@@ -91,26 +95,44 @@
         </ion-content>
       </ion-modal>
 
+      <ion-modal v-if="showDismissVCardConfirmation" :is-open="showDismissVCardConfirmation">
+        <ion-content class="ion-text-center">
+          <ion-card>
+            <ion-card-content>
+              <ion-card-title>Dismiss VCard</ion-card-title>
+              <p>Are you sure you want to dismiss this VCard?</p>
+            </ion-card-content>
+          </ion-card>
+          <ion-button expand="full" color="danger" @click="dismissVCardConfirmed">Yes</ion-button>
+          <ion-button expand="full" color="success" @click="closeModals">No</ion-button>
+        </ion-content>
+      </ion-modal>
     </ion-content>
   </ion-page>
-
 </template>
   
 <script setup>
 import { ref, inject, onMounted } from 'vue';
-import { IonPage, IonContent, IonList, IonItem, IonInput, IonButton, IonAvatar, IonSpinner, IonButtons, IonBackButton } from '@ionic/vue';
+import {
+  IonPage, IonContent, IonList, IonItem, IonInput, IonButton,
+  IonAvatar, IonSpinner, IonButtons, IonBackButton, IonModal,
+  IonCard, IonCardContent, IonCardTitle, IonHeader, IonToolbar, IonTitle
+} from '@ionic/vue';
+import { Storage } from '@ionic/storage';
 import { useRouter } from 'vue-router'
 
 const axios = inject('axios');
 
 const serverBaseUrl = inject('serverBaseUrl');
 const router = useRouter();
+const store = new Storage();
 const props = defineProps({
   phone: {
     type: String,
     required: true
   }
 });
+//await store.set('token', response.data.access_token);
 
 const originalName = ref('');
 const originalEmail = ref('');
@@ -122,21 +144,22 @@ const vcard = ref({});
 const photoUrl = ref('');
 
 onMounted(() => {
-    axios.get(`vcard/${props.phone}`).then((response) => {
-        vcard.value = response.data.data;
-        console.log(vcard.value)
-        isLoading.value = false;
-        if(vcard.value.photo_url == undefined){
-          photoUrl.value = null
-        } else {
-          photoUrl.value = `${serverBaseUrl}/storage/fotos/${vcard.value.photo_url}`;
-        }
+  axios.get(`vcard/${props.phone}`).then(async (response) => {
+    vcard.value = response.data.data;
+    console.log(vcard.value)
+    isLoading.value = false;
+    if (vcard.value.photo_url == undefined) {
+      photoUrl.value = null
+    } else {
+      photoUrl.value = `${serverBaseUrl}/storage/fotos/${vcard.value.photo_url}`;
+    }
     // Store original values
     originalName.value = vcard.value.name;
     originalEmail.value = vcard.value.email;
     originalEditing.value = false;
-        
-    })
+    await store.create();
+
+  })
     .catch((error) => {
       console.log(error);
     });
@@ -150,6 +173,20 @@ const editablePIN = ref('');
 const isEditing = ref(false);
 const showSuccessModal = ref(false);
 const showErrorModal = ref(false);
+const showDismissVCardConfirmation = ref(false);
+
+
+const dismissVCard = async () => {
+  showDismissVCardConfirmation.value = true;
+};
+
+const dismissVCardConfirmed = async () => {
+  await store.remove('token');
+  await store.remove('phone_number');
+  await store.remove('pin');
+  closeModals();
+  router.push('/login');
+};
 
 const toggleEditMode = async () => {
   if (isEditing.value) {
@@ -178,7 +215,7 @@ const toggleEditMode = async () => {
       // Revert changes on error
       vcard.value.name = originalName.value;
       vcard.value.email = originalEmail.value;
-      
+
     }
   } else {
     // Enter edit mode
@@ -193,5 +230,6 @@ const toggleEditMode = async () => {
 const closeModals = () => {
   showSuccessModal.value = false;
   showErrorModal.value = false;
+  showDismissVCardConfirmation.value = false;
 };
 </script>
