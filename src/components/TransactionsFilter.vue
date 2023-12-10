@@ -52,7 +52,7 @@ const props = defineProps(['filterByDate', 'filterByType']);
 const name = ref();
 const showStartDate = ref(false);
 const showEndDate = ref(false);
-const selectedStartDate = ref(props.filterByDate?.startDate || new Date(1990,1,1).toISOString()) ;
+const selectedStartDate = ref(props.filterByDate?.startDate || new Date(2023,1,1).toISOString()) ;
 const selectedEndDate = ref(props.filterByDate?.endDate || new Date().toISOString());
 const selectedType = ref(props.filterByType || 'All');
 

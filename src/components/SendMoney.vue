@@ -17,17 +17,27 @@
                             <div class="w-100">
                                 <ion-card>
                                     <ion-card-content>
+                                        <br>
+                                        <br>
                                         <ion-icon :icon="paperPlaneOutline" style="font-size:64px; color: black"></ion-icon>
-                                        <p>Sending {{ inputValue }} to {{ name }} ({{ pairPhone }})</p>
+                                        <br>
+                                        <br>
+                                        <br>
+                                        <p style="font-size: 18px; color: black;">Sending {{ inputValue }} </p>
+                                        <p style="font-size: 18px; color: black;">to {{ name }} ({{ pairPhone }})</p>
+                                        <br>
+                                        <br>
                                     </ion-card-content>
                                 </ion-card>
                             </div>
                             <div class="w-100" style="display:flex; flex-direction: column; justify-content: center;">
                                 <label for="inputCode">Confirmation Code</label>
+                                <br>
                                 <input id="inputCode" type="password" placeholder="Enter your Confirmation Code"
                                     maxlength="3" @input="validateConfirmationCode"
                                     v-model="sendMoneyRequest.confirmation_code"
                                     style="text-align: center; font-size:20px; width: 100%" :disabled="isLoading" />
+                                    <br>
                                 <ion-text v-if="errors && errors.confirmation_code" color="danger">
                                     {{ errors.confirmation_code[0] }}
                                 </ion-text>
@@ -43,9 +53,17 @@
                             <div class="w-100">
                                 <ion-card>
                                     <ion-card-content>
+                                        <br>
+                                        <br>
                                         <ion-icon :icon="paperPlaneOutline" style="font-size:64px; color: green"></ion-icon>
-                                        <p>Transaction Successful!</p>
-                                        <p>Sent {{ inputValue }} to {{ name }} ({{ pairPhone }})</p>
+                                        <br>
+                                        <br>
+                                        <p style="font-size: 17px; color: black;">Transaction Successful!</p>
+                                        <br>
+                                        <p>{{ inputValue }} sent to {{ name }} ({{ pairPhone }})</p>
+                                            <br>
+                                            <p v-if="route.params.autosavings"> {{ decimasSupostasTrue.toFixed(2) }}€ saved to your Piggy Bank Vault</p>
+                                        <br>
                                     </ion-card-content>
                                 </ion-card>
                             </div>
@@ -154,7 +172,7 @@ import {
     IonPage, IonHeader, IonToolbar, IonTitle, IonContent,
     IonButtons, IonBackButton, IonGrid, IonRow, IonCol,
     IonCard, IonCardContent, IonCheckbox, IonButton, IonText,
-    IonSpinner, IonLabel, IonInput, IonModal, IonIcon
+    IonSpinner, IonLabel, IonInput, IonModal, IonIcon, onIonViewWillEnter
 } from '@ionic/vue';
 import { setMask, removeMask, formatToNumber } from 'simple-mask-money'
 import { paperPlaneOutline } from 'ionicons/icons';
@@ -175,11 +193,13 @@ const createRequest = () => {
         value: 0,
         pair_vcard: props.pairPhone,
         confirmation_code: '',
-        autoSave: false
+        autoSave: route.params.autosavings
     }
 }
 
+const autoSavings = ref(route.params.autosavings);
 const sendMoneyRequest = ref(createRequest())
+
 
 const vCard = ref(null)
 const errors = ref({
@@ -196,6 +216,14 @@ const isRequestSuccessful = ref(false)
 const isTransactionSuccessful = computed(() => {
     return isRequestSuccessful.value && !errors.value.confirmation_code.length
 })
+
+onIonViewWillEnter(async () => {
+    await store.create();
+    const autosavings = await store.get('autosavings');
+    if (autosavings){
+      autoSavings.value = autosavings;
+    }
+  });
 
 const name = computed(() => {
     return route.query.name ?? props.pairPhone
@@ -239,15 +267,42 @@ const createTransaction = () => {
     validateConfirmationCode();
 }
 
+const decimasSupostasTrue = ref(0);
 const createTransactionConfirmed = () => {
+    // isLoading.value = true;
+    // axios.post('/transactions', sendMoneyRequest.value).then((response) => {
+    //     isRequestSuccessful.value = true;
+    //     isLoading.value = false;
+    // }).catch((error) => {
+    //     isLoading.value = false;
+    //     errors.value = error.response.data.errors;
+    // })
     isLoading.value = true;
     axios.post('/transactions', sendMoneyRequest.value).then((response) => {
         isRequestSuccessful.value = true;
         isLoading.value = false;
+
+        if(autoSavings.value){
+            // Auto-saving logic
+            const totalBalance = response.data.new_balance;
+            const transactionValue = sendMoneyRequest.value.value;
+            //if(autoSavings.value){
+            const centimos = transactionValue - Math.floor(transactionValue);
+
+            let decimasSupostas = 1 - centimos;
+            // Round if necessary
+            decimasSupostas = Math.round(decimasSupostas * 100) / 100;
+            if (totalBalance >= decimasSupostas) {
+                vCard.value.balance = vCard.value.balance - decimasSupostas;
+                vCard.value.piggy_bank_balance = vCard.value.piggy_bank_balance + decimasSupostas;
+                decimasSupostasTrue.value = decimasSupostas;
+            }
+        }
     }).catch((error) => {
+        console.log("catch");
         isLoading.value = false;
         errors.value = error.response.data.errors;
-    })
+    });
 }
 
 const cancel = () => {
