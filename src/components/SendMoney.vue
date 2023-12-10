@@ -257,15 +257,46 @@ const createTransaction = () => {
     validateConfirmationCode();
 }
 
+const decimasSupostasTrue = ref(0);
 const createTransactionConfirmed = () => {
+    // isLoading.value = true;
+    // axios.post('/transactions', sendMoneyRequest.value).then((response) => {
+    //     isRequestSuccessful.value = true;
+    //     isLoading.value = false;
+    // }).catch((error) => {
+    //     isLoading.value = false;
+    //     errors.value = error.response.data.errors;
+    // })
     isLoading.value = true;
     axios.post('/transactions', sendMoneyRequest.value).then((response) => {
         isRequestSuccessful.value = true;
         isLoading.value = false;
+
+        // Auto-saving logic
+        const totalBalance = response.data.new_balance;
+        const transactionValue = sendMoneyRequest.value.value;
+
+        const centimos = transactionValue - Math.floor(transactionValue);
+        // Calculate the amount left until the next integer
+        let decimasSupostas = 1 - centimos;
+        // Round if necessary
+        decimasSupostas = Math.round(decimasSupostas * 100) / 100;
+        if (totalBalance >= decimasSupostas) {
+            // Update the local vCard data (assuming vCard is reactive)
+            vCard.value.balance = vCard.value.balance - decimasSupostas;
+            vCard.value.piggy_bank_balance = vCard.value.piggy_bank_balance + decimasSupostas;
+            decimasSupostasTrue.value = decimasSupostas;
+            // Save the changes to the server if needed
+            // axios.put(`/vcard/${route.params.phoneNumber}`, {
+            //     balance: vCard.value.balance,
+            //     piggy_bank_balance: vCard.value.piggy_bank_balance,
+            // });
+        }
     }).catch((error) => {
+        console.log("catch lol: ");
         isLoading.value = false;
         errors.value = error.response.data.errors;
-    })
+    });
 }
 
 const cancel = () => {
