@@ -10,15 +10,50 @@
             </ion-toolbar>
         </ion-header>
         <ion-content class="ion-padding">
-            <ion-modal v-if="showSuccessModal" :is-open="showSuccessModal">
+            <ion-modal v-if="showConfirmationModal" :is-open="showConfirmationModal">
                 <ion-content class="ion-text-center">
-                    <ion-card>
-                        <ion-card-content>
-                            <ion-icon :icon="paperPlaneOutline" style="font-size:64px; color: green" ></ion-icon>
-                            <p>{{ inputValue }} sent to {{ name }}</p>
-                        </ion-card-content>
-                    </ion-card>
-                    <ion-button expand="full" color="success" @click="closeModal">Continue</ion-button>
+                    <ion-grid class="vertically-center-aligned">
+                        <ion-row class="vertically-center-aligned" v-if="!isTransactionSuccessful">
+                            <div class="w-100">
+                                <ion-card>
+                                    <ion-card-content>
+                                        <ion-icon :icon="paperPlaneOutline" style="font-size:64px; color: black"></ion-icon>
+                                        <p>Sending {{ inputValue }} to {{ name }} ({{ pairPhone }})</p>
+                                    </ion-card-content>
+                                </ion-card>
+                            </div>
+                            <div class="w-100" style="display:flex; flex-direction: column; justify-content: center;">
+                                <label for="inputCode">Confirmation Code</label>
+                                <input id="inputCode" type="password" placeholder="Enter your Confirmation Code"
+                                    maxlength="3" @input="validateConfirmationCode"
+                                    v-model="sendMoneyRequest.confirmation_code"
+                                    style="text-align: center; font-size:20px; width: 100%" :disabled="isLoading" />
+                                <ion-text v-if="errors && errors.confirmation_code" color="danger">
+                                    {{ errors.confirmation_code[0] }}
+                                </ion-text>
+                            </div>
+                            <div class="w-100">
+                                <ion-button expand="full" color="primary" :disabled="!isConfirmationCodeValid || isLoading"
+                                    @click="createTransactionConfirmed">Confirm</ion-button>
+                                <ion-button expand="full" color="dark" :disabled="isLoading"
+                                    @click="cancel">Cancel</ion-button>
+                            </div>
+                        </ion-row>
+                        <ion-row class="vertically-center-aligned" v-else>
+                            <div class="w-100">
+                                <ion-card>
+                                    <ion-card-content>
+                                        <ion-icon :icon="paperPlaneOutline" style="font-size:64px; color: green"></ion-icon>
+                                        <p>Transaction Successful!</p>
+                                        <p>Sent {{ inputValue }} to {{ name }} ({{ pairPhone }})</p>
+                                    </ion-card-content>
+                                </ion-card>
+                            </div>
+                            <div class="w-100">
+                                <ion-button expand="full" color="success" @click="closeModal">Continue</ion-button>
+                            </div>
+                        </ion-row>
+                    </ion-grid>
                 </ion-content>
             </ion-modal>
             <div class="d-flex flex-column justify-content-space-between h-100">
@@ -38,15 +73,6 @@
                                 @input="validateFormData" placeholder="0,00€" v-model="inputValue" :disabled="isLoading">
                             <ion-text v-if="errors && errors.value" color="danger">
                                 {{ errors.value[0] }}
-                            </ion-text>
-                        </ion-col>
-                        <ion-col size="12">
-                            <ion-label position="floating">Confirmation Code</ion-label>
-                            <ion-input type="password" placeholder="Enter your Confirmation Code" :maxlength="3"
-                                @ion-input="validateFormData" v-model="sendMoneyRequest.confirmation_code"
-                                :disabled="isLoading"></ion-input>
-                            <ion-text v-if="errors && errors.confirmation_code" color="danger">
-                                {{ errors.confirmation_code[0] }}
                             </ion-text>
                         </ion-col>
                     </ion-row>
@@ -74,6 +100,12 @@
     gap: 5px;
 }
 
+.vertical-align-content>* {
+    display: flex !important;
+    align-content: center !important;
+    align-items: center !important;
+}
+
 .d-flex {
     display: flex;
 }
@@ -96,6 +128,19 @@
 
 .h-100 {
     height: 100%;
+}
+
+ion-grid.vertically-center-aligned {
+    height: 100%;
+    overflow: hidden;
+}
+
+ion-row.vertically-center-aligned {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    flex-direction: column;
 }
 
 .w-100 {
@@ -124,13 +169,17 @@ const props = defineProps({
     }
 })
 
-const sendMoneyRequest = ref({
-    vcard: route.params.phoneNumber,
-    value: 0,
-    pair_vcard: props.pairPhone,
-    confirmation_code: '',
-    autoSave: false
-})
+const createRequest = () => {
+    return {
+        vcard: route.params.phoneNumber,
+        value: 0,
+        pair_vcard: props.pairPhone,
+        confirmation_code: '',
+        autoSave: false
+    }
+}
+
+const sendMoneyRequest = ref(createRequest())
 
 const vCard = ref(null)
 const errors = ref({
@@ -138,9 +187,15 @@ const errors = ref({
     confirmation_code: []
 })
 const isFormValid = ref(false)
+const isConfirmationCodeValid = ref(false)
 const isLoading = ref(false)
 const inputValue = ref(null)
-const showSuccessModal = ref(false)
+const showConfirmationModal = ref(false)
+const isRequestSuccessful = ref(false)
+
+const isTransactionSuccessful = computed(() => {
+    return isRequestSuccessful.value && !errors.value.confirmation_code.length
+})
 
 const name = computed(() => {
     return route.query.name ?? props.pairPhone
@@ -164,23 +219,41 @@ const validateFormData = () => {
         errors.value.value.push('You don\'t have enough balance to send this amount');
     }
 
-    if (!sendMoneyRequest.value.confirmation_code) {
-        isValid = false;
-        errors.value.confirmation_code.push('You must enter a your confirmation code');
-    }
-
     isFormValid.value = isValid;
 }
 
+const validateConfirmationCode = () => {
+    errors.value.confirmation_code = []
+    let isValid = true;
+
+    if (!sendMoneyRequest.value.confirmation_code) {
+        isValid = false;
+        errors.value.confirmation_code.push('You must enter your confirmation code');
+    }
+
+    isConfirmationCodeValid.value = isValid;
+}
+
 const createTransaction = () => {
+    showConfirmationModal.value = true;
+    validateConfirmationCode();
+}
+
+const createTransactionConfirmed = () => {
     isLoading.value = true;
     axios.post('/transactions', sendMoneyRequest.value).then((response) => {
+        isRequestSuccessful.value = true;
         isLoading.value = false;
-        showSuccessModal.value = true;
     }).catch((error) => {
         isLoading.value = false;
         errors.value = error.response.data.errors;
     })
+}
+
+const cancel = () => {
+    showConfirmationModal.value = false;
+    inputValue.value = null;
+    router.go(-1);
 }
 
 watch(inputValue, (newValue) => {
@@ -213,7 +286,7 @@ const availableBalanceFormatted = computed(() => {
 })
 
 const closeModal = () => {
-    showSuccessModal.value = false;
+    showConfirmationModal.value = false;
     router.go(-1);
 }
 
@@ -231,6 +304,8 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
+    createRequest();
+    isRequestSuccessful.value = false;
     removeMask('#inputValue')
 })
 
