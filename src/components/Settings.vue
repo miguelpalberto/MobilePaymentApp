@@ -22,7 +22,7 @@
 
       <ion-item @click="toggleNotifications" style="align-items: center;">
         <ion-label>Notifications</ion-label>
-        <ion-toggle :checked="notifications"></ion-toggle>
+        <ion-toggle :checked="isNotificationsEnabled"></ion-toggle>
       </ion-item>
     </ion-content>
   </ion-page>
@@ -33,6 +33,7 @@ import { ref, inject, onMounted } from 'vue';
 import { IonPage, IonContent, IonList, IonItem, IonInput, IonButton, IonAvatar, IonSpinner, IonButtons, IonBackButton, onIonViewWillEnter } from '@ionic/vue';
 import { useRouter, useRoute } from 'vue-router'
 import { Storage } from '@ionic/storage';
+//import axios from 'axios';
 
 const axios = inject('axios');
 
@@ -48,7 +49,11 @@ const props = defineProps({
 });
 
 const autoSavings = ref(route.params.autosavings);
-const notifications = ref(route.params.togglenotifications);
+//const notifications = ref(route.params.togglenotifications);
+const setToggleNotificationsUrl = `/vcards/${route.params.phoneNumber}/toggleNotifications`;
+const getCurrentToggleNotiUrl = `/vcards/${route.params.phoneNumber}/getNotificationsToggle`;
+const isNotificationsEnabled = ref(true); // ao inicio
+
 
 onIonViewWillEnter(async () => {
     await store.create();
@@ -56,10 +61,11 @@ onIonViewWillEnter(async () => {
     if (autosavings){
       autoSavings.value = autosavings;
     }
-    const togglenotifications = await store.get('togglenotifications');
-    if (togglenotifications){
-        notifications.value = togglenotifications;
-    }
+  //   const togglenotifications = await store.get('togglenotifications');
+  // if (togglenotifications) {
+  //   notifications.value = togglenotifications;
+  //   isNotificationsEnabled.value = togglenotifications;
+  // }
   });
 
 const saveAutoSavings = async () => {
@@ -70,13 +76,28 @@ const saveAutoSavings = async () => {
 }
 
 const toggleNotifications = async () => {
-    notifications.value = !notifications.value;
-    await store.set('togglenotifications', notifications.value);
-}
+    try {
+        const response = await axios.patch(setToggleNotificationsUrl);
+        isNotificationsEnabled.value = response.data.notifications;
+    } catch (error) {
+        console.error('Error toggling notifications:', error);
+    }
+};
+
+const getCurrentToggleNotifications = async () => {
+    try {
+        const response = await axios.get(getCurrentToggleNotiUrl);
+        isNotificationsEnabled.value = response.data.notifications;
+        //console.log(isNotificationsEnabled.value)
+    } catch (error) {
+        console.error('Error fetching notifications status:', error);
+        // Handle error as needed
+    }
+};
 
 
 
-onMounted(() => {
-  // You can perform additional setup when the component is mounted.
+onMounted(async () => {
+  getCurrentToggleNotifications()
 });
 </script>
