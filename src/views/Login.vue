@@ -10,7 +10,7 @@
         <ion-list class="list-container">
           <ion-item>
             <ion-label position="floating">Phone</ion-label>
-            <ion-input v-model="telemovel" type="number"></ion-input>
+            <ion-input v-model="telemovel" type="number" maxlength="9"></ion-input>
           </ion-item>
           <ion-item>
             <ion-label position="floating">Password</ion-label>
@@ -158,26 +158,28 @@ const register = async (phone_number) => {
           password: password.value,
           confirmation_code: pin.value
         }).then(async (response) => {
-          console.log(response.data);
           if (response.data.access_token){
 
             try{
               await store.set('token', response.data.access_token);
               await store.set('phone_number', telemovel.value);
               await store.set('pin', pin.value);
-
+              
               if(Capacitor.getPlatform() === 'web') {
                 console.log('PushNotifications not supported on web');
               } else {
                 await register(telemovel.value);
               }
-
+              
               await store.set('autosavings', true);
               router.push('/dashboard');
+              
+              telemovel.value = '';
+              password.value = '';
+              pin.value = '';
             } catch (error){
               console.log(error);
             }
-           
           }
         }, (error) => {
           console.log(error);
@@ -186,23 +188,7 @@ const register = async (phone_number) => {
           }
         });
       }
-
-      //valid 
-      
   };
-
-  // const abc = async () => {
-  //     const store = new Storage();
-  //     await store.create();
-  //     const name = await store.get('name');
-  //     // await store.set('name', 'Max');
-  //     console.log(name)
-  // }
-
-  // abc()
-
-
-
   </script>
   
   <style scoped>
