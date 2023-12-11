@@ -1,5 +1,5 @@
 <script>
-import { personCircleOutline, settingsOutline } from 'ionicons/icons';
+import { personCircleOutline, settingsOutline, notificationsOutline } from 'ionicons/icons';
 </script>
 
 <template>
@@ -34,6 +34,18 @@ import { personCircleOutline, settingsOutline } from 'ionicons/icons';
               <!-- Second Column: User and Settings icons inside styled ion-buttons -->
               <ion-col size="6">
                 <div class="ion-text-end"> <!-- Align content to the end (right) -->
+                  <ion-button :router-link="notificationsUrl" size="small" style="height: 38px;" color="dark">
+                    <ion-icon :icon="notificationsOutline"></ion-icon>
+
+
+                        <ion-label v-if="numNotifications > 0">
+                          <ion-badge slot="end" color="danger">{{ numNotifications }}</ion-badge>
+                        </ion-label>
+
+                  
+                  </ion-button>
+
+
                   <ion-button :router-link="vcardUrl" size="small" style="height: 38px;" color="dark">
                     <ion-icon :icon="personCircleOutline"></ion-icon>
                   </ion-button>
@@ -43,11 +55,8 @@ import { personCircleOutline, settingsOutline } from 'ionicons/icons';
                   </ion-button>
                 </div>
               </ion-col>
-            </ion-row>
-            
-            
-            
 
+            </ion-row>
             <ion-row>
               <ion-col size="6">
                 <Balance :phone="phone" :balance="balance"></Balance>
@@ -150,6 +159,7 @@ const loading = ref(false);
 const pinCorrect = ref(false);
 const balance = ref(null);
 const piggyBankBalance = ref(null);
+const numNotifications = ref();
 
 
 const transactionUrl = computed(() => {
@@ -170,6 +180,10 @@ const sendMoneyUrl = computed(() => {
   return '/mycontacts';
 });
 
+const notificationsUrl = computed(() => {
+  return `/notifications/${phone.value}`;
+});
+
 const getBalance = async() => {
     const response = await axios.get(`/vcard/${phone.value}`)
     balance.value = response.data.data.balance;
@@ -180,6 +194,12 @@ const getPiggyBankBalance = async() => {
     piggyBankBalance.value = response.data.data.piggy_bank_balance;
 }
 
+const getNotifications = async() => {
+  const response = await axios.get(`vcards/${phone.value}/notifications`)
+  numNotifications.value = response.data.data
+      .filter(notification => notification.notification_read == false)
+      .length;
+}
 
 
 const checkPin = async (pin) => {
@@ -197,6 +217,7 @@ const handleRefresh = async(event) => {
   try{
     await getBalance();
     await getPiggyBankBalance();
+    await getNotifications();
   }catch(error){
     console.log(error);
   }
@@ -206,11 +227,13 @@ const handleRefresh = async(event) => {
 onMounted(() => {
   getBalance();
   getPiggyBankBalance();
+  getNotifications();
 })
 
 onIonViewWillEnter(()=>{
   getBalance();
   getPiggyBankBalance();
+  getNotifications();
 })
 
 </script>
