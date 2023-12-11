@@ -21,7 +21,7 @@
   </ion-app>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import {
   IonApp,
   IonContent,
@@ -36,7 +36,7 @@ import {
   IonRouterOutlet,
   IonSplitPane,
 } from '@ionic/vue';
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import {
   archiveOutline,
   archiveSharp,
@@ -53,6 +53,8 @@ import {
   warningOutline,
   warningSharp,
 } from 'ionicons/icons';
+
+
 
 const selectedIndex = ref(0);
 const appPages = [
