@@ -56,6 +56,7 @@
   const password = ref('');
   const pin = ref('');
 
+
   const errors = ref([]);
 
 
@@ -170,10 +171,12 @@ const register = async (phone_number) => {
                 await register(telemovel.value);
               }
               
+              await store.set('autosavings', true);
+              router.push('/dashboard');
+              
               telemovel.value = '';
               password.value = '';
               pin.value = '';
-              router.push('/dashboard');
             } catch (error){
               console.log(error);
             }
