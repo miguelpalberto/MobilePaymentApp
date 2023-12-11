@@ -48,6 +48,11 @@ export default (axios) => {
       component: () => import ('../components/SendMoney.vue'),
       props: (route) => ({ pairPhone: route.params.pairPhone })
     },
+    {
+      path: '/notifications/:phone',
+      props: (route) => ({ phone: route.params.phone }),
+      component: () => import ('../components/Notifications.vue')
+    },
   ]
   
   const router = createRouter({
