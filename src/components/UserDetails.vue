@@ -28,48 +28,50 @@
 
           <ion-list class="list-container" v-if="!isEditing">
             <ion-item v-if="!isEditing">
-            <ion-input label="Phone number" v-model="phoneNumber" label-placement="stacked" :readonly="true"></ion-input>
-          </ion-item>
-          <ion-item>
-            <ion-input label="Name" v-model="vcard.name" label-placement="stacked" :readonly="true"></ion-input>
-          </ion-item>
-          <ion-item>
-            <ion-input label="Email" v-model="vcard.email" label-placement="stacked" :readonly="true"></ion-input>
-          </ion-item>
+              <ion-input label="Phone number" v-model="phoneNumber" label-placement="stacked"
+                :readonly="true"></ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-input label="Name" v-model="vcard.name" label-placement="stacked" :readonly="true"></ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-input label="Email" v-model="vcard.email" label-placement="stacked" :readonly="true"></ion-input>
+            </ion-item>
 
-          <!-- <ion-item>
+            <!-- <ion-item>
             <ion-input label="Password" v-model="maskedPassword" label-placement="stacked" :readonly="true"></ion-input>
           </ion-item>
           <ion-item>
             <ion-input label="PIN" v-model="maskedPIN" label-placement="stacked" :readonly="true"></ion-input>
           </ion-item> -->
-          
-        </ion-list>
-        <ion-list class="list-container" v-else>
-          <ion-item>
-            <ion-input label="Phone number" v-model="phoneNumber" label-placement="stacked" :readonly="true"></ion-input>
-          </ion-item>
-          <ion-item>
-            <ion-input label="Name" v-model="vcard.name" label-placement="stacked" :readonly="false"></ion-input>
-          </ion-item>
-          <ion-item>
-            <ion-input label="Email" v-model="vcard.email" label-placement="stacked" :readonly="false"></ion-input>
-          </ion-item>
-          <!-- <ion-item>
+
+          </ion-list>
+          <ion-list class="list-container" v-else>
+            <ion-item>
+              <ion-input label="Phone number" v-model="phoneNumber" label-placement="stacked"
+                :readonly="true"></ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-input label="Name" v-model="vcard.name" label-placement="stacked" :readonly="false"></ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-input label="Email" v-model="vcard.email" label-placement="stacked" :readonly="false"></ion-input>
+            </ion-item>
+            <!-- <ion-item>
             <ion-input label="Password" v-model="editablePassword" label-placement="stacked" type="password" :readonly="false"></ion-input>
           </ion-item>
           <ion-item>
             <ion-input label="PIN" v-model="editablePIN" label-placement="stacked" type="password" :readonly="false"></ion-input>
           </ion-item> -->
-        </ion-list>
-        
-        <ion-button expand="block" :color="isEditing ? 'secondary' : 'primary'" @click="toggleEditMode">
-          {{ isEditing ? 'Save' : 'Edit' }}
-        </ion-button>
-      </div>
-        
+          </ion-list>
+
+          <ion-button expand="block" :color="isEditing ? 'secondary' : 'primary'" @click="toggleEditMode">
+            {{ isEditing ? 'Save' : 'Edit' }}
+          </ion-button>
+        </div>
+
         <!-- <ion-button expand="block" @click="toggleEditMode">{{ isEditing ? 'Save' : 'Change Password and PIN' }}</ion-button> -->
-        
+
         <div>
           <ion-button expand="block" color="warning" @click="dismissVCard" :disabled="isEditing">
             <ion-icon :icon="personRemoveOutline"></ion-icon>
@@ -171,6 +173,7 @@ import {
 import { Storage } from '@ionic/storage';
 import { useRouter } from 'vue-router'
 import { trash, personRemoveOutline } from 'ionicons/icons';
+import { FCM } from "@capacitor-community/fcm";
 
 const axios = inject('axios');
 
@@ -241,6 +244,8 @@ const dismissVCardConfirmed = async () => {
   await store.remove('token');
   await store.remove('phone_number');
   await store.remove('pin');
+  FCM.unsubscribeFrom({ topic: props.phone })
+    .catch((err) => console.log(err));
   closeModals();
   router.push('/login');
 };
@@ -257,11 +262,14 @@ const deleteVCardConfirmed = async () => {
         password: confirmationPassword.value,
         confirmation_code: confirmationPin.value
       }
-    }).then(async (response) => {
+    })
+    .then(async (response) => {
       await store.remove('token');
       await store.remove('phone_number');
       await store.remove('pin');
       closeModals();
+      FCM.unsubscribeFrom({ topic: props.phone })
+        .catch((err) => console.log(err));
       router.push('/login');
     })
   }
