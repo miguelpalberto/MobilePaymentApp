@@ -172,6 +172,7 @@ const register = async (phone_number) => {
               }
               
               await store.set('autosavings', true);
+              await store.set('togglenotifications', true);
               router.push('/dashboard');
               
               telemovel.value = '';
