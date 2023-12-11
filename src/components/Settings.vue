@@ -30,7 +30,7 @@
 
 <script setup>
 import { ref, inject, onMounted } from 'vue';
-import { IonPage, IonContent, IonList, IonItem, IonInput, IonButton, IonAvatar, IonSpinner, IonButtons, IonBackButton, onIonViewWillEnter } from '@ionic/vue';
+import { IonPage, IonContent, IonList, IonItem, IonInput, IonButton, IonAvatar, IonSpinner, IonButtons, IonBackButton, onIonViewWillEnter, IonToggle } from '@ionic/vue';
 import { useRouter, useRoute } from 'vue-router'
 import { Storage } from '@ionic/storage';
 //import axios from 'axios';
