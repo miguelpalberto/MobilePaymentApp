@@ -19,7 +19,7 @@
                 </ion-item>
 
                 <ion-item v-for="notification in notifications" :key="notification.id">
-                <ion-grid @click="setNotificationRead(notification)" >
+                <ion-grid>
                     <ion-row>
                         <ion-col col="2" size="10">
                             <ion-text>
@@ -28,7 +28,7 @@
                             </ion-text>
                         </ion-col>
                         <ion-col col="2" size="2">
-                            <ion-checkbox :disabled="notification.notification_read" :checked="notification.notification_read" alignment="center"></ion-checkbox>
+                            <ion-checkbox @click="setNotificationRead(notification)" :disabled="notification.notification_read" :checked="notification.notification_read" alignment="center"></ion-checkbox>
                         </ion-col>
                     </ion-row>
                 </ion-grid>
@@ -59,7 +59,7 @@ import {
   IonButtons,
   IonButton,
   IonText, 
-  IonCheckbox
+  IonCheckbox 
 } from "@ionic/vue";
 
 import { inject, ref, onMounted } from "vue";
@@ -94,8 +94,8 @@ const loadNotifications = () => {
 const setNotificationRead = (notification) => {
     axios.post(`vcards/notifications/${ notification.id }`)
     .then(() => {
-    // loadNotifications();
-      router.push(`/transactions/${props.phone}`)
+        loadNotifications();
+        router.push(`/transactions/${props.phone}`)
     })
     .catch((error) => {
       console.log(error)
@@ -105,7 +105,7 @@ const setNotificationRead = (notification) => {
 const setAllNotificationsRead = () => {
     axios.post(`vcards/${ props.phone }/notifications`)
     .then(() => {
-        // loadNotifications();
+        loadNotifications();
         router.push(`/transactions/${props.phone}`)
     })
     .catch((error) => {
