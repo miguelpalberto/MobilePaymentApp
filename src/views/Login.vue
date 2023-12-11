@@ -58,6 +58,77 @@
 
   const errors = ref([]);
 
+
+
+
+import { FCM } from "@capacitor-community/fcm";
+import { PushNotifications } from '@capacitor/push-notifications';
+// external required step
+// register for push
+
+
+
+
+const register = async (phone_number) => {
+    // await PushNotifications.requestPermissions();
+    // await PushNotifications.register();
+
+    PushNotifications.requestPermissions().then(result => {
+        console.log('result ' + JSON.stringify(result));
+        // alert('result ' + JSON.stringify(result));
+        // Initialize the registration with FCM Token
+        // FCM.init(result);
+        PushNotifications.register();
+        
+      });
+      // On registration we can get the token
+      PushNotifications.addListener('registration', (token) => {
+        console.log('Push registration success, token: ' + token.value);
+        // alert('Push registration success, token: ' + token.value);
+        //TODO: store token server side?
+      });
+
+
+    // now you can subscribe to a specific topic
+    FCM.subscribeTo({ topic: `${phone_number}` })
+      .then((r) => console.log(`subscribed to topic`))
+      .catch((err) => console.log(err));
+
+    // // Unsubscribe from a specific topic
+    // // FCM.unsubscribeFrom({ topic: "test" })
+    // //   .then(() => alert(`unsubscribed from topic`))
+    // //   .catch((err) => console.log(err));
+
+    // // Get FCM token instead of the APN one returned by Capacitor
+    // FCM.getToken()
+    //   .then((r) => alert(`Token ${r.token}`))
+    //   .catch((err) => console.log(err));
+
+    // Delete the old FCM token and get a new one
+    // FCM.refreshToken()
+    //   .then((r) => alert(`Token ${r.token}`))
+    //   .catch((err) => console.log(err));
+
+    // Remove FCM instance
+    // FCM.deleteInstance()
+    //   .then(() => alert(`Token deleted`))
+    //   .catch((err) => console.log(err));
+
+    // Enable the auto initialization of the library
+    // FCM.setAutoInit({ enabled: true }).then(() => alert(`Auto init enabled`));
+
+    // // Check the auto initialization status
+    // FCM.isAutoInitEnabled().then((r) => {
+    //   console.log("Auto init is " + (r.enabled ? "enabled" : "disabled"));
+    // });
+    }
+
+
+
+
+
+
+
   const login = () => {
       // return router.push('/dashboard');
       //valida se o campo telemovel está vazio e se tem 9 digitos e começa por 9
@@ -92,6 +163,13 @@
               await store.set('token', response.data.access_token);
               await store.set('phone_number', telemovel.value);
               await store.set('pin', pin.value);
+              
+              if(Capacitor.getPlatform() === 'web') {
+                console.log('PushNotifications not supported on web');
+              } else {
+                await register(telemovel.value);
+              }
+              
               telemovel.value = '';
               password.value = '';
               pin.value = '';
