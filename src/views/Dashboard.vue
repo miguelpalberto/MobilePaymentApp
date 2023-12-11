@@ -1,5 +1,5 @@
 <script>
-import { personCircleOutline, settingsOutline } from 'ionicons/icons';
+import { personCircleOutline, settingsOutline, notificationsOutline } from 'ionicons/icons';
 </script>
 
 <template>
@@ -34,6 +34,18 @@ import { personCircleOutline, settingsOutline } from 'ionicons/icons';
               <!-- Second Column: User and Settings icons inside styled ion-buttons -->
               <ion-col size="6">
                 <div class="ion-text-end"> <!-- Align content to the end (right) -->
+                  <ion-button :router-link="notificationsUrl" size="small" style="height: 38px;" color="dark">
+                    <ion-icon :icon="notificationsOutline"></ion-icon>
+
+
+                        <ion-label v-if="numNotifications > 0">
+                          <ion-badge slot="end" color="danger">{{ numNotifications }}</ion-badge>
+                        </ion-label>
+
+                  
+                  </ion-button>
+
+
                   <ion-button :router-link="vcardUrl" size="small" style="height: 38px;" color="dark">
                     <ion-icon :icon="personCircleOutline"></ion-icon>
                   </ion-button>
@@ -43,27 +55,8 @@ import { personCircleOutline, settingsOutline } from 'ionicons/icons';
                   </ion-button>
                 </div>
               </ion-col>
-              <ion-col size="6">
-                <ion-button :router-link="notificationsUrl" fill="clear" style="width:100%;">
-                  <ion-card>
-                    <ion-card-header></ion-card-header>
-                    <ion-card-subtitle>Notifications</ion-card-subtitle>
-                    <ion-chip>
-                      <ion-avatar>
-                        <img src="https://cdn-icons-png.flaticon.com/512/3119/3119338.png" />
-                      </ion-avatar>
-                      <ion-label v-if="numNotifications > 0">
-                        <ion-badge slot="end" color="danger">{{ numNotifications }}</ion-badge>
-                      </ion-label>
-                    </ion-chip>
-                  </ion-card>
-                </ion-button>
-              </ion-col>
-            </ion-row>
-            
-            
-            
 
+            </ion-row>
             <ion-row>
               <ion-col size="6">
                 <Balance :phone="phone" :balance="balance"></Balance>
