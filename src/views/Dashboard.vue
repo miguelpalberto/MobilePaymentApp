@@ -1,3 +1,7 @@
+<script>
+import { personCircleOutline, settingsOutline } from 'ionicons/icons';
+</script>
+
 <template>
   <ion-page>
     <ion-header>
@@ -18,13 +22,25 @@
             <ion-refresher-content></ion-refresher-content>
           </ion-refresher>
           <ion-grid>
+
             <ion-row>
+              <!-- First Column: Welcome, {{ phone }} -->
               <ion-col size="6">
                 <div>
-                  Welcome, {{ phone }}<!-- //todo mudar para nome -->
-                  <div>
-                    <ion-button :router-link="vcardUrl">User</ion-button>
-                  </div>
+                  Welcome, {{ phone }}
+                </div>
+              </ion-col>
+            
+              <!-- Second Column: User and Settings icons inside styled ion-buttons -->
+              <ion-col size="6">
+                <div class="ion-text-end"> <!-- Align content to the end (right) -->
+                  <ion-button :router-link="vcardUrl" size="small" style="height: 38px;" color="dark">
+                    <ion-icon :icon="personCircleOutline"></ion-icon>
+                  </ion-button>
+            
+                  <ion-button :router-link="settingsUrl" size="small" style="height: 38px;" color="dark">
+                    <ion-icon :icon="settingsOutline"></ion-icon>
+                  </ion-button>
                 </div>
               </ion-col>
               <ion-col size="6">
@@ -44,6 +60,10 @@
                 </ion-button>
               </ion-col>
             </ion-row>
+            
+            
+            
+
             <ion-row>
               <ion-col size="6">
                 <Balance :phone="phone" :balance="balance"></Balance>
@@ -134,10 +154,11 @@ import Balance from "../components/Balance.vue";
 import LastTransaction from "../components/LastTransaction.vue";
 import PiggyBankBalance from '../components/PiggyBankBalance.vue';
 import ContactList from "../components/ContactList.vue";
+import { useRoute } from 'vue-router';
+
 
 const axios = inject("axios");
 
-import { useRoute } from 'vue-router';
 const route = useRoute();
 
 const phone = ref(route.params.phoneNumber);
@@ -153,6 +174,9 @@ const transactionUrl = computed(() => {
 });
 const vcardUrl = computed(() => {
   return `/mydetails/${phone.value}`;
+});
+const settingsUrl = computed(() => {
+  return `/settings/${phone.value}`;
 });
 
 const piggyBankUrl = computed(() => {

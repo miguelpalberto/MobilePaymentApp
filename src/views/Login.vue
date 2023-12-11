@@ -56,6 +56,7 @@
   const password = ref('');
   const pin = ref('');
 
+
   const errors = ref([]);
 
   const login = () => {
@@ -93,6 +94,7 @@
               await store.set('token', response.data.access_token);
               await store.set('phone_number', telemovel.value);
               await store.set('pin', pin.value);
+              await store.set('autosavings', true);
               router.push('/dashboard');
             } catch (error){
               console.log(error);

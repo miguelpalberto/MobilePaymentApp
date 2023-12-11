@@ -39,6 +39,11 @@ export default (axios) => {
       component: () => import ('../components/UserDetails.vue')
     },
     {
+      path: '/settings/:phone',
+      props: (route) => ({ phone: route.params.phone }),
+      component: () => import ('../components/Settings.vue')
+    },
+    {
       path: '/mycontacts',
       component: () => import ('../components/ContactList.vue')
     },
@@ -66,6 +71,7 @@ export default (axios) => {
     const store = new Storage();
     await store.create();
     const token = await store.get("token");
+    const autosavings = await store.get("autosavings");
     if (!token && to.path !== "/login") {
       next({ path: '/login' });
     } else {
@@ -75,7 +81,8 @@ export default (axios) => {
       console.log("phone number", phoneNumber);
   
       if (phoneNumber) {
-        to.params = {...to.params, phoneNumber}
+        to.params = {...to.params, phoneNumber, autosavings}
+
       }
       next()
     }
